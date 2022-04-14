@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 
 from config.loader import bot
 from data import text_data as td
-from keyboards.inline.user_menu import user_auth
+from keyboards import inline as ik
 
 __all__ = [
     "user_authorization",
@@ -17,7 +17,7 @@ from utils.number_validator import is_phone_number_valid
 
 
 async def user_authorization(message: types.Message):
-    await bot.send_message(chat_id=message.chat.id, text=td.AUTHORIZATION, reply_markup=await user_auth())
+    await bot.send_message(chat_id=message.chat.id, text=td.AUTHORIZATION, reply_markup=await ik.user_auth())
 
 
 async def get_user_phone_number(call: types.CallbackQuery):
@@ -34,24 +34,39 @@ async def check_phone(message: types.Message, state: FSMContext):
         await state.finish()
         r = requests.get('https://api.nutritionscience.pro/api/v1/users/tgbot',
                          params={'phone': "89867178660"})  # params={'phone': "phone_number"}
-
+        user_type = ...  # получаем тип юзера из бд по номеру, как я понял
         result = dict(r.json())
-        if result['user'] == True and result['is_active'] == False:
-            await bot.send_message(id, "Учетная запись неактивна, либо не приобретен курс. Отправить вопрос невозможно",
-                                   reply_markup=kb.main)
-        if result['user'] == True and result['is_active'] == True:
-            if type == 'ученик':
-                await bot.send_message(id, "Вы успешно авторизовались", reply_markup=kb.ask)
-            if type == 'куратор':
-                await bot.send_message(id, "Вы успешно авторизовались", reply_markup=kb.mainkur)
-            if type == 'наставник':
-                await bot.send_message(id, "Вы успешно авторизовались", reply_markup=kb.mainknast)
-        if result['user'] == False and result['is_active'] == False:
-            await bot.send_message(id, "Авторизация невозможна.", reply_markup=kb.main)
-        await bot.send_message(
-            chat_id=message.chat.id,
-            text=result
-        )
+        if result['user'] and not result['is_active']:
+            await bot.send_message(
+                chat_id=message.chat.id,
+                text=td.UNAVALIABLE_AUTH,
+                reply_markup=await ik.user_auth()
+            )
+        if result['user'] and result['is_active']:
+            if user_type == 'ученик':
+                await bot.send_message(
+                    chat_id=message.chat.id,
+                    text=td.SUCCESS_LOGIN,
+                    reply_markup=await ik.user_questions()
+                )
+            if user_type == 'куратор':
+                await bot.send_message(
+                    chat_id=message.chat.id,
+                    text=td.SUCCESS_LOGIN,
+                    reply_markup=await ik.main_kurator_menu()
+                )
+            if user_type == 'наставник':
+                await bot.send_message(
+                    chat_id=message.chat.id,
+                    text=td.SUCCESS_LOGIN,
+                    reply_markup=await ik.main_nastavnik_menu()
+                )
+        if not result['user'] and not result['is_active']:
+            await bot.send_message(
+                chat_id=message.chat.id,
+                text=td.UNAVALIABLE_AUTH_2,
+                reply_markup=ik.user_auth()
+            )
     else:
         await bot.send_message(
             chat_id=message.chat.id,
