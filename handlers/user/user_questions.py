@@ -35,15 +35,6 @@ async def is_right_question(message: types.Message, state: FSMContext):
     )
 
 
-async def change_user_question(call: types.CallbackQuery):
-    await bot.edit_message_text(
-        text=td.ASK_A_QUESTION,
-        chat_id=call.from_user.id,
-        message_id=call.message.message_id
-    )
-    await UserQuestion.waiting_for_user_question.set()
-
-
 async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     user_question = data.get("user_question")
@@ -52,9 +43,15 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
     user_state = int(cur.execute('SELECT state FROM data WHERE id == ?', (us_id,)).fetchone()[0])
     role = cur.execute('SELECT role FROM data WHERE id == ?', (us_id,)).fetchone()[0]
     number = int(cur.execute('SELECT number FROM data WHERE id == ?', (us_id,)).fetchone()[0])
-    if role == 'ученик' and user_state == 1:
-        await bot.send_message(us_id, "Ваш вопросы был направлен куратору, пожалуйста, ожидайте ответа", )
-        await bot.send_message(config.CHANNEL_KURATOR,
-                               f'{us_id}\nНомер пользователя: {number}\n\nВопрос: {user_question}')
-        await bot.send_message(config.CHANNEL_NASTAVNIK,
-                               f'{us_id}\nНомер пользователя: {number}\n\nВопрос: {user_question}')
+    if role == td.ROLE_USER and user_state == 1:
+        await bot.edit_message_text(chat_id=us_id,
+                                    text=td.QUESTION_SENDED,
+                                    message_id=call.message.message_id)
+        await bot.send_message(
+            chat_id=config.CHANNEL_KURATOR,
+            text=td.USER_QUSTION.format(us_id, number, user_question)
+        )
+        await bot.send_message(
+            chat_id=config.CHANNEL_NASTAVNIK,
+            text=td.USER_QUSTION.format(us_id, number, user_question)
+        )

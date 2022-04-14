@@ -6,14 +6,25 @@ from config.loader import bot, cur, base
 from data import text_data as td
 from keyboards import inline as ik
 
+from states import UserAuth
+from utils.number_validator import is_phone_number_valid
+
 __all__ = [
     "user_authorization",
     "get_user_phone_number",
-    "check_phone"
+    "check_phone",
+    "get_profile_panel"
 ]
 
-from states import UserAuth
-from utils.number_validator import is_phone_number_valid
+
+async def get_profile_panel(message: types.Message):
+    # авторизация юзера, если он уже есть в бд, то сразу отправлям меню
+    await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+    user = ...
+    if user:
+        await bot.send_message(chat_id=message.chat.id, text=td.SUCCESS_LOGIN, reply_markup=await ik.user_questions())
+    else:
+        await bot.send_message(chat_id=message.chat.id, text=td.AUTHORIZATION, reply_markup=await ik.user_auth())
 
 
 async def user_authorization(message: types.Message):
