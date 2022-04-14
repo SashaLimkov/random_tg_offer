@@ -36,6 +36,18 @@ async def check_phone(message: types.Message, state: FSMContext):
                          params={'phone': "89867178660"})  # params={'phone': "phone_number"}
 
         result = dict(r.json())
+        if result['user'] == True and result['is_active'] == False:
+            await bot.send_message(id, "Учетная запись неактивна, либо не приобретен курс. Отправить вопрос невозможно",
+                                   reply_markup=kb.main)
+        if result['user'] == True and result['is_active'] == True:
+            if type == 'ученик':
+                await bot.send_message(id, "Вы успешно авторизовались", reply_markup=kb.ask)
+            if type == 'куратор':
+                await bot.send_message(id, "Вы успешно авторизовались", reply_markup=kb.mainkur)
+            if type == 'наставник':
+                await bot.send_message(id, "Вы успешно авторизовались", reply_markup=kb.mainknast)
+        if result['user'] == False and result['is_active'] == False:
+            await bot.send_message(id, "Авторизация невозможна.", reply_markup=kb.main)
         await bot.send_message(
             chat_id=message.chat.id,
             text=result
