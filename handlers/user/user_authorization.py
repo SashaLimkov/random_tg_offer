@@ -34,7 +34,18 @@ async def check_phone(message: types.Message, state: FSMContext):
         await state.finish()
         r = requests.get('https://api.nutritionscience.pro/api/v1/users/tgbot',
                          params={'phone': "89867178660"})  # params={'phone': "phone_number"}
-        cur.execute('INSERT INTO data VALUES(?,?,?,?,?)',
+        try:
+            authorizted = cur.execute('SELECT state FROM data WHERE id = ?', (message.from_user.id,)).fetchone()[0]
+            if authorizted == 1:
+                await bot.send_message(
+                    chat_id=message.chat.id,
+                    text=td.AGAIN_AUTHORIZATED,
+                    reply_markup=await ik.user_questions()
+                )
+                return
+        except Exception as e:
+            pass
+        cur.execute('INSERT INTO  data VALUES(?,?,?,?,?)',
                     (message.from_user.id, phone_number,  'ученик', '0', '0'))
         base.commit()
         user_type = cur.execute('SELECT role FROM data WHERE id = ?', (message.from_user.id,)).fetchone()[0]
@@ -47,18 +58,27 @@ async def check_phone(message: types.Message, state: FSMContext):
             )
         if result['user'] and result['is_active']:
             if user_type == 'ученик':
+                cur.execute('UPDATE data SET state == ? WHERE id == ?',
+                            (1, message.from_user.id))
+                base.commit()
                 await bot.send_message(
                     chat_id=message.chat.id,
                     text=td.SUCCESS_LOGIN,
                     reply_markup=await ik.user_questions()
                 )
             if user_type == 'куратор':
+                cur.execute('UPDATE data SET state == ? WHERE id == ?',
+                            (1, message.from_user.id))
+                base.commit()
                 await bot.send_message(
                     chat_id=message.chat.id,
                     text=td.SUCCESS_LOGIN,
                     reply_markup=await ik.main_kurator_menu()
                 )
             if user_type == 'наставник':
+                cur.execute('UPDATE data SET state == ? WHERE id == ?',
+                            (1, message.from_user.id))
+                base.commit()
                 await bot.send_message(
                     chat_id=message.chat.id,
                     text=td.SUCCESS_LOGIN,
