@@ -2,7 +2,7 @@ import requests
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from config.loader import bot
+from config.loader import bot, cur, base
 from data import text_data as td
 from keyboards import inline as ik
 
@@ -34,7 +34,10 @@ async def check_phone(message: types.Message, state: FSMContext):
         await state.finish()
         r = requests.get('https://api.nutritionscience.pro/api/v1/users/tgbot',
                          params={'phone': "89867178660"})  # params={'phone': "phone_number"}
-        user_type = ...  # получаем тип юзера из бд по номеру, как я понял
+        cur.execute('INSERT INTO data VALUES(?,?,?,?,?)',
+                    (message.from_user.id, phone_number,  'ученик', '0', '0'))
+        base.commit()
+        user_type = cur.execute('SELECT role FROM data WHERE id = ?', (message.from_user.id,)).fetchone()
         result = dict(r.json())
         if result['user'] and not result['is_active']:
             await bot.send_message(
