@@ -37,7 +37,7 @@ async def check_phone(message: types.Message, state: FSMContext):
         cur.execute('INSERT INTO data VALUES(?,?,?,?,?)',
                     (message.from_user.id, phone_number,  'ученик', '0', '0'))
         base.commit()
-        user_type = cur.execute('SELECT role FROM data WHERE id = ?', (message.from_user.id,)).fetchone()
+        user_type = cur.execute('SELECT role FROM data WHERE id = ?', (message.from_user.id,)).fetchone()[0]
         result = dict(r.json())
         if result['user'] and not result['is_active']:
             await bot.send_message(
