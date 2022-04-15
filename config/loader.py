@@ -8,6 +8,7 @@ bot = Bot(token=BOT_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 user_data = {}
+kurators_state={}
 
 base = sqlite3.connect('table.db')
 cur = base.cursor()

@@ -76,13 +76,7 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
             chat_id=config.CHANNEL_KURATOR,
             text=td.USER_QUSTION.format(us_id, number, user_question)
         )
-        nast = await bot.send_message(
-            chat_id=config.CHANNEL_NASTAVNIK,
-            text=td.USER_QUSTION.format(us_id, number, user_question)
-        )
-        user_data[us_id] = {"kur_mes": kur, "nast_mes": nast}
+        user_data[us_id] = {"kur_mes": kur}
         cur.execute('UPDATE data SET kurmes == ? WHERE id == ?',
                     (kur.message_id, call.from_user.id))
-        cur.execute('UPDATE data SET nastmes == ? WHERE id == ?',
-                        (nast.message_id, call.from_user.id))
         base.commit()
