@@ -6,10 +6,9 @@ from config.loader import bot, user_data, cur
 from data import text_data as td
 from keyboards import inline as ik
 
-__all__ = [
+all = [
     "get_answer",
     "new_question",
-    "echo"
 ]
 
 from states import UserQuestion
@@ -30,7 +29,11 @@ async def new_question(message: types.Message):
     if message.text == "завершить":
         print("sadasd")
     else:
-        print(user_data["kur_mes"])
+        kur_mess_id = cur.execute('SELECT kurmes FROM data WHERE id == ?', (message.from_user.id,)).fetchone()[0]
+        nast_mess_id = cur.execute('SELECT nastmes FROM data WHERE id == ?', (message.from_user.id,)).fetchone()[0]
+        print(kur_mess_id)
+        print(nast_mess_id)
+        # print(user_data["kur_mes"])
         # us_id = message.chat.id
         # number = int(cur.execute('SELECT number FROM data WHERE id == ?', (us_id,)).fetchone()[0])
         # kur = await bot.send_message(

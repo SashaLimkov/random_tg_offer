@@ -13,6 +13,6 @@ base = sqlite3.connect('table.db')
 cur = base.cursor()
 
 base.execute(
-    'CREATE TABLE IF NOT EXISTS {}(id PRIMARY KEY,number,role,state,state2)'.format(
+    'CREATE TABLE IF NOT EXISTS {}(id PRIMARY KEY,number,role,state,state2,kurmes,nastmes)'.format(
         'data'))
 base.commit()
