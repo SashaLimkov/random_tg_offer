@@ -18,7 +18,6 @@ __all__ = [
 
 
 async def get_profile_panel(message: types.Message):
-    # авторизация юзера, если он уже есть в бд, то сразу отправлям меню
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     try:
         number = cur.execute('SELECT number FROM data WHERE id == ?', (message.from_user.id,)).fetchone()[0]
