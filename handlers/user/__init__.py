@@ -8,7 +8,7 @@ from states import UserAuth, UserQuestion
 
 def setup(dp: Dispatcher):
     dp.register_message_handler(user_authorization.user_authorization, filters.CommandStart())
-    dp.register_message_handler(user_authorization.get_profile_panel, filters.Command("/lk"))
+    dp.register_message_handler(user_authorization.get_profile_panel, filters.Command("lk"))
     dp.register_callback_query_handler(user_authorization.get_user_phone_number,
                                        lambda call: call.data == kd.AUTHORIZATION_CD)
     dp.register_callback_query_handler(user_questions.create_user_question,
