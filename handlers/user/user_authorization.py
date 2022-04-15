@@ -61,9 +61,10 @@ async def check_phone(message: types.Message, state: FSMContext):
                 )
                 return
         except Exception as e:
-            print(e)
-        cur.execute('INSERT INTO  data VALUES(?,?,?,?,?)',
-                    (message.from_user.id, phone_number, 'ученик', '0', '0'))
+            print("smt_here")
+            pass
+        cur.execute('INSERT INTO  data VALUES(?,?,?,?,?,?,?)',
+                    (message.from_user.id, phone_number, 'ученик', '0', '0',"l","l"))
         base.commit()
         user_type = cur.execute('SELECT role FROM data WHERE id = ?', (message.from_user.id,)).fetchone()[0]
         result = dict(r.json())

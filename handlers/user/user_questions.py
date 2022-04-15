@@ -55,7 +55,6 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
     role = cur.execute('SELECT role FROM data WHERE id == ?', (us_id,)).fetchone()[0]
     number = int(cur.execute('SELECT number FROM data WHERE id == ?', (us_id,)).fetchone()[0])
     if role == td.ROLE_USER and user_state == 1:
-        await UserQuestion.waiting_for_answer.set()
         try:
             if user_data[us_id]:
                 await bot.edit_message_text(chat_id=us_id,

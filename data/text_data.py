@@ -12,4 +12,4 @@ USER_QUSTION = "{} \nНомер пользователя: {}\n\nВопрос: {}
 ROLE_USER = "ученик"
 ROLE_KURATOR = "куратор"
 ROLE_NASTAVNIK = "наставник"
-MENTORS_ANSWER = "{}\nОтвет от куратора:\n{}"
+MENTORS_ANSWER = "{}\nОтвет от куратора:\n{}\nПродолжите беседу, или напишите завершить."
