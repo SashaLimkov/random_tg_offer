@@ -1,8 +1,8 @@
 from aiogram import types
 
-from config.loader import bot
-from data import text_data as td
-from keyboards import inline as ik
+from src.bot.config.loader import bot
+from src.bot.data import text_data as td
+from src.bot.keyboards import inline as ik
 
 
 async def get_answer(message: types.Message):

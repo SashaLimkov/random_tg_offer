@@ -1,10 +1,10 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from config import config
-from config.loader import bot, cur, user_data
-from data import text_data as td
-from keyboards import inline as ik
+from src.bot.config import config
+from src.bot.config.loader import bot, cur, user_data
+from src.bot.data import text_data as td
+from src.bot.keyboards import inline as ik
 
 __all__ = [
     "create_user_question",
@@ -13,7 +13,7 @@ __all__ = [
     "add_question"
 ]
 
-from states import UserQuestion
+from src.bot.states import UserQuestion
 
 
 async def create_user_question(call: types.CallbackQuery):

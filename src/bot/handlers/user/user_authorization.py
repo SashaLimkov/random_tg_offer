@@ -2,12 +2,12 @@ import requests
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from config.loader import bot, cur, base
-from data import text_data as td
-from keyboards import inline as ik
+from src.bot.config.loader import bot, cur, base
+from src.bot.data import text_data as td
+from src.bot.keyboards import inline as ik
 
-from states import UserAuth
-from utils.number_validator import is_phone_number_valid
+from src.bot.states import UserAuth
+from src.bot.utils.number_validator import is_phone_number_valid
 
 __all__ = [
     "user_authorization",

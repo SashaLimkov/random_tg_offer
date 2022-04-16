@@ -1,9 +1,10 @@
-from aiogram import Dispatcher, types
+from aiogram import Dispatcher
 from aiogram.dispatcher import filters
 
-from data import keyboards_data as kd
-from handlers.user import user_authorization, user_questions, user_answers
-from states import UserAuth, UserQuestion
+from src.bot.data import keyboards_data as kd
+from src.bot.handlers.user import user_questions, user_answers
+from src.bot.handlers.user import user_authorization
+from src.bot.states import UserAuth, UserQuestion
 
 
 def setup(dp: Dispatcher):
