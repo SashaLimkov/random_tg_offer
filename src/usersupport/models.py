@@ -19,12 +19,19 @@ class TelegramUser(TimeBasedModel):
 
 
 class Role(TelegramUser):
-    telegram_user = models.ForeignKey(TelegramUser, on_delete=models.DO_NOTHING, verbose_name="Пользователь", related_name="User")
+    telegram_user = models.ForeignKey(
+        TelegramUser,
+        on_delete=models.DO_NOTHING,
+        verbose_name="Пользователь",
+        related_name="User",
+    )
     user_role = models.CharField(max_length=255, verbose_name="Роль")
 
 
 class UserQuestion(TimeBasedModel):
-    user = models.ForeignKey(TelegramUser, on_delete=models.DO_NOTHING, verbose_name="Пользователь")
+    user = models.ForeignKey(
+        TelegramUser, on_delete=models.DO_NOTHING, verbose_name="Пользователь"
+    )
     question = models.CharField(max_length=4000, verbose_name="Вопрос")
     kurators_mes_id = models.BigIntegerField(verbose_name="id вопроса у кураторов")
     mentors_mes_id = models.BigIntegerField(verbose_name="id вопроса у наставников")

@@ -13,7 +13,7 @@ async def get_answer(message: types.Message):
     await bot.send_message(
         chat_id=user_id,
         text=td.MENTORS_ANSWER.format(user_question, mentors_answer),
-        reply_markup=await ik.is_get_answer()
+        reply_markup=await ik.is_get_answer(),
     )
 
 
