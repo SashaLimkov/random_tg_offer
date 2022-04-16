@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from data import keyboards_data as kd
+from src.bot.data import keyboards_data as kd
 
 __all__ = [
     "user_auth",

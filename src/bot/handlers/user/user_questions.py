@@ -1,10 +1,10 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from config import config
-from config.loader import bot, cur, user_data, base
-from data import text_data as td
-from keyboards import inline as ik
+from src.bot.config import config
+from src.bot.config.loader import bot, cur, user_data
+from src.bot.data import text_data as td
+from src.bot.keyboards import inline as ik
 
 __all__ = [
     "create_user_question",
@@ -13,7 +13,7 @@ __all__ = [
     "add_question"
 ]
 
-from states import UserQuestion
+from src.bot.states import UserQuestion
 
 
 async def create_user_question(call: types.CallbackQuery):
@@ -55,28 +55,29 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
     role = cur.execute('SELECT role FROM data WHERE id == ?', (us_id,)).fetchone()[0]
     number = int(cur.execute('SELECT number FROM data WHERE id == ?', (us_id,)).fetchone()[0])
     if role == td.ROLE_USER and user_state == 1:
-        # await UserQuestion.waiting_for_answer.set()
-        # try:
-        #     if user_data[us_id]:
-        #         await bot.edit_message_text(chat_id=us_id,
-        #                                     text=td.QUESTION_SENDED,
-        #                                     message_id=call.message.message_id)
-        #         kur = await user_data[us_id]["kur_msg"].reply(
-        #             text=td.USER_QUSTION.format(us_id, number, user_question)
-        #         )
-        #         nast = await user_data[us_id]["nast_msg"].reply(
-        #             text=td.USER_QUSTION.format(us_id, number, user_question)
-        #         )
-        #         user_data[us_id] = {"kur_mes": kur, "nast_mes": nast}
-        # except KeyError:
-        await bot.edit_message_text(chat_id=us_id,
-                                    text=td.QUESTION_SENDED,
-                                    message_id=call.message.message_id)
-        kur = await bot.send_message(
-            chat_id=config.CHANNEL_KURATOR,
-            text=td.USER_QUSTION.format(us_id, number, user_question)
-        )
-        user_data[us_id] = {"kur_mes": kur}
-        cur.execute('UPDATE data SET kurmes == ? WHERE id == ?',
-                    (kur.message_id, call.from_user.id))
-        base.commit()
+        await UserQuestion.waiting_for_answer.set()
+        try:
+            if user_data[us_id]:
+                await bot.edit_message_text(chat_id=us_id,
+                                            text=td.QUESTION_SENDED,
+                                            message_id=call.message.message_id)
+                kur = await user_data[us_id]["kur_msg"].reply(
+                    text=td.USER_QUSTION.format(us_id, number, user_question)
+                )
+                nast = await user_data[us_id]["nast_msg"].reply(
+                    text=td.USER_QUSTION.format(us_id, number, user_question)
+                )
+                user_data[us_id] = {"kur_mes": kur, "nast_mes": nast}
+        except KeyError:
+            await bot.edit_message_text(chat_id=us_id,
+                                        text=td.QUESTION_SENDED,
+                                        message_id=call.message.message_id)
+            kur = await bot.send_message(
+                chat_id=config.CHANNEL_KURATOR,
+                text=td.USER_QUSTION.format(us_id, number, user_question)
+            )
+            nast = await bot.send_message(
+                chat_id=config.CHANNEL_NASTAVNIK,
+                text=td.USER_QUSTION.format(us_id, number, user_question)
+            )
+            user_data[us_id] = {"kur_mes": kur, "nast_mes": nast}
