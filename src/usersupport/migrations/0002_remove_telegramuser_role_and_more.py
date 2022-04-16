@@ -7,44 +7,66 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('usersupport', '0001_initial'),
+        ("usersupport", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='telegramuser',
-            name='role',
+            model_name="telegramuser",
+            name="role",
         ),
         migrations.AlterField(
-            model_name='userquestion',
-            name='kurators_mes_id',
-            field=models.BigIntegerField(verbose_name='id вопроса у кураторов'),
+            model_name="userquestion",
+            name="kurators_mes_id",
+            field=models.BigIntegerField(verbose_name="id вопроса у кураторов"),
         ),
         migrations.AlterField(
-            model_name='userquestion',
-            name='mentors_mes_id',
-            field=models.BigIntegerField(verbose_name='id вопроса у наставников'),
+            model_name="userquestion",
+            name="mentors_mes_id",
+            field=models.BigIntegerField(verbose_name="id вопроса у наставников"),
         ),
         migrations.AlterField(
-            model_name='userquestion',
-            name='question',
-            field=models.CharField(max_length=4000, verbose_name='Вопрос'),
+            model_name="userquestion",
+            name="question",
+            field=models.CharField(max_length=4000, verbose_name="Вопрос"),
         ),
         migrations.AlterField(
-            model_name='userquestion',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='usersupport.telegramuser', verbose_name='Пользователь'),
+            model_name="userquestion",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="usersupport.telegramuser",
+                verbose_name="Пользователь",
+            ),
         ),
         migrations.CreateModel(
-            name='Role',
+            name="Role",
             fields=[
-                ('telegramuser_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='usersupport.telegramuser')),
-                ('user_role', models.CharField(max_length=255, verbose_name='Роль')),
-                ('telegram_user', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='User', to='usersupport.telegramuser', verbose_name='Пользователь')),
+                (
+                    "telegramuser_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="usersupport.telegramuser",
+                    ),
+                ),
+                ("user_role", models.CharField(max_length=255, verbose_name="Роль")),
+                (
+                    "telegram_user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="User",
+                        to="usersupport.telegramuser",
+                        verbose_name="Пользователь",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('usersupport.telegramuser',),
+            bases=("usersupport.telegramuser",),
         ),
     ]
