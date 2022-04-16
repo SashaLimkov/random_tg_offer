@@ -1,9 +1,8 @@
 from aiogram import Dispatcher
 from aiogram.utils import executor
 
-
-import handlers
-from config.loader import dp
+from src.bot import handlers
+from src.bot.config.loader import dp
 
 
 async def on_startup(dispatcher: Dispatcher):
@@ -13,7 +12,6 @@ async def on_startup(dispatcher: Dispatcher):
 async def on_shutdown(dispatcher: Dispatcher):
     await dispatcher.storage.close()
     await dispatcher.storage.wait_closed()
-
 
 
 if __name__ == "__main__":
