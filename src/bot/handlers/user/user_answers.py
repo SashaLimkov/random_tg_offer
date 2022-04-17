@@ -6,6 +6,9 @@ from bot.config.loader import bot, user_data, kurators_state
 from bot.data import text_data as td
 from bot.keyboards import reply as rk
 from bot.keyboards import inline as ik
+from usersupport.models import TelegramUser, UserQuestion
+from bot.services.db import user as user_db
+from bot.services.db import question as question_db
 
 all = [
     "get_answer",
@@ -15,6 +18,21 @@ all = [
 
 async def get_answer(message: types.Message):
     user_id = int(message.reply_to_message.text.split("\n")[0])
+    user: TelegramUser = await user_db.select_user(user_id=user_id)
+    helper_id = message.from_user.id
+    helper: TelegramUser = await user_db.select_user(user_id=helper_id)
+    question: UserQuestion = await question_db.select_question(user=user)
+    if helper.state == 1:
+        await user_db.update_user_state(user_id=helper_id, state=0)
+        await question_db.add_helper(user=user, helper_id=helper_id)
+        kurators, mentors = await user_db.select_all_kurators_and_mentors()
+        m_list = [m.chat_id for m in mentors]
+        m = eval(question.mes_id)
+        helper_chat_mess_id = {message.chat.id:message.reply_to_message.message_id}
+        mes_id = helper_chat_mess_id.update(m_list)
+
+
+
     # cur.execute('UPDATE data SET kurmes == ? WHERE id == ?',
     #             (message.reply_to_message.message_id, message.from_user.id))
     # base.commit()
