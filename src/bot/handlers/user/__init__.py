@@ -25,26 +25,24 @@ def setup(dp: Dispatcher):
         user_authorization.set_user_state,
         lambda call: call.data == kd.KUR_ACTIVITY_CD
     )
+    dp.register_message_handler(save_chats.update_chanel, lambda message: message.forward_from_chat)
+
     # user ask a question
-    dp.register_callback_query_handler(
-        user_questions.create_user_question,
-        lambda call: call.data == kd.ASK_A_QUESTION_CD
-    )
-    dp.register_callback_query_handler(
-        user_questions.send_user_questions,
-        lambda call: call.data == kd.RIGHT_QUESTION_CD,
-        state=UserQuestion.waiting_for_user_question
-    )
-    dp.register_callback_query_handler(
-        user_questions.create_user_question,
-        state=UserQuestion.waiting_for_user_question
-    )
+    # dp.register_callback_query_handler(
+    #     user_questions.create_user_question,
+    #     lambda call: call.data == kd.ASK_A_QUESTION_CD
+    # )
+    # dp.register_callback_query_handler(
+    #     user_questions.send_user_questions,
+    #     lambda call: call.data == kd.RIGHT_QUESTION_CD,
+    #     state=UserQuestion.waiting_for_user_question
+    # )
+    # dp.register_callback_query_handler(
+    #     user_questions.create_user_question,
+    #     state=UserQuestion.waiting_for_user_question
+    # )
     # add chanel_and_chat_id
-    dp.register_message_handler(
-        save_chats.update_chat_id,
-        content_types=["new_chat_members", "left_chat_member"],
-    )
-    dp.register_message_handler(save_chats.update_chanel, content_types=types.ContentTypes.ANY)
+
     # dp.register_message_handler(user_answers.get_answer, lambda message: message.reply_to_message)
     # dp.register_message_handler(user_authorization.get_profile_panel, filters.Command("lk"))
     # dp.register_callback_query_handler(kur_rate.set_rate, lambda call: call.data.startswith("r_"))

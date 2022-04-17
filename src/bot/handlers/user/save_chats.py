@@ -13,8 +13,6 @@ async def update_chat_id(message: types.Message):
 
 
 async def update_chanel(message: types.Message):
-    if "forward_from_chat" in message:
-        chat_id = message.chat.id
-        chanel_id = message.forward_from_chat.id
-        user: TelegramUser = await user_db.get_user_by_chanel_chat_id(chat_id=chat_id)
-        await user_db.update_chanel_id(user_id=user.user_id, chanel_id=chanel_id)
+    chat_id = message.chat.id
+    chanel_id = message.forward_from_chat.id
+    await user_db.update_chanel_id(chat_id=chat_id, chanel_id=chanel_id)
