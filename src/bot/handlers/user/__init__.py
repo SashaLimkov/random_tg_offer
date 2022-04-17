@@ -43,6 +43,7 @@ def setup(dp: Dispatcher):
         state=UserQuestion.waiting_for_user_question
     )
     dp.register_message_handler(user_questions.is_right_question, state=UserQuestion.waiting_for_user_question)
+    dp.register_message_handler(user_questions.continue_question, state=UserQuestion.waiting_for_new_question)
     # dp.register_callback_query_handler(
     #     user_questions.create_user_question,
     #     state=UserQuestion.waiting_for_user_question
