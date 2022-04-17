@@ -31,7 +31,7 @@ class Role(TelegramUser):
         verbose_name="Пользователь",
         related_name="User",
     )
-    user_role = models.CharField(max_length=255, verbose_name="Роль")
+    user_role = models.CharField(max_length=255, verbose_name="Роль", default="ученик")
 
 
 class UserQuestion(TimeBasedModel):
