@@ -61,9 +61,14 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
     all_kurators_list = [k.chat_id for k in kurators]
     k_list = [k.chanel_id for k in kurators if k.state == 1]
     m_list = [m.chanel_id for m in mentors if m.state == 1]
-    text = f"{user.user_id}\nВопрос от пользователя {user.name}:{user.phone}\n{user_question}"
-    history = f"{user.name}:{user_question}"
-    await question_db.add_question(user=user, question=user_question)
+    text = "{}\nВопрос от пользователя {}: {}\n{}"
+    history = f"Q: {user_question}\n"
+    try:
+        q: ModelUserQuestion = await question_db.select_question(user=user)
+        user_question = f"{q.history}{history}"
+        history = user_question
+    except Exception:
+        await question_db.add_question(user=user, question=user_question)
     await question_db.add_history(user=user, history=history)
     # if not k_list: если все кураторы заняты
     #     random_kurator = random.choice(all_kurators_list)

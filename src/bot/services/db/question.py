@@ -19,7 +19,7 @@ def add_question(user: TelegramUser, question):
 
 @sync_to_async
 def add_history(user, history):
-    return UserQuestion.objects.filter(user=user).update(history=f"{history}\n")
+    return UserQuestion.objects.filter(user=user).update(history=f"{history}")
 
 
 @sync_to_async
