@@ -1,11 +1,11 @@
 
 from aiogram import types
 
-from config import config
-from config.loader import bot, user_data, kurators_state
-from data import text_data as td
-from keyboards import reply as rk
-from keyboards import inline as ik
+from bot.config import config
+from bot.config.loader import bot, user_data, kurators_state
+from bot.data import text_data as td
+from bot.keyboards import reply as rk
+from bot.keyboards import inline as ik
 
 all = [
     "get_answer",
