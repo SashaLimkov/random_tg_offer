@@ -11,6 +11,7 @@ def setup(dp: Dispatcher):
     dp.register_message_handler(setup_role.setup_user_role, filters.Command("setup"))
     dp.register_message_handler(setup_role.check_key, state=Role.secret_key)
     # user auth
+    dp.register_message_handler(user_authorization.get_profile_panel, filters.Command("lk"))
     dp.register_message_handler(user_authorization.user_authorization, filters.CommandStart())
     dp.register_callback_query_handler(
         user_authorization.get_user_phone_number,
@@ -28,15 +29,20 @@ def setup(dp: Dispatcher):
     dp.register_message_handler(save_chats.update_chanel, lambda message: message.forward_from_chat)
 
     # user ask a question
-    # dp.register_callback_query_handler(
-    #     user_questions.create_user_question,
-    #     lambda call: call.data == kd.ASK_A_QUESTION_CD
-    # )
-    # dp.register_callback_query_handler(
-    #     user_questions.send_user_questions,
-    #     lambda call: call.data == kd.RIGHT_QUESTION_CD,
-    #     state=UserQuestion.waiting_for_user_question
-    # )
+    dp.register_callback_query_handler(
+        user_questions.create_user_question,
+        lambda call: call.data == kd.ASK_A_QUESTION_CD
+    )
+    dp.register_callback_query_handler(
+        user_questions.wrong_q,
+        lambda call: call.data == kd.WRONG_QUESTION_CD,
+        state=UserQuestion.waiting_for_user_question)
+    dp.register_callback_query_handler(
+        user_questions.send_user_questions,
+        lambda call: call.data == kd.RIGHT_QUESTION_CD,
+        state=UserQuestion.waiting_for_user_question
+    )
+    dp.register_message_handler(user_questions.is_right_question, state=UserQuestion.waiting_for_user_question)
     # dp.register_callback_query_handler(
     #     user_questions.create_user_question,
     #     state=UserQuestion.waiting_for_user_question
@@ -47,5 +53,4 @@ def setup(dp: Dispatcher):
     # dp.register_message_handler(user_authorization.get_profile_panel, filters.Command("lk"))
     # dp.register_callback_query_handler(kur_rate.set_rate, lambda call: call.data.startswith("r_"))
     # dp.register_message_handler(kur_rate.get_rate, state=Rate.waiting_for_rate)
-    # dp.register_message_handler(user_questions.is_right_question, state=UserQuestion.waiting_for_user_question)
     # dp.register_message_handler(user_answers.new_question)

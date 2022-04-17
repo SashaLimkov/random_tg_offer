@@ -23,14 +23,14 @@ async def get_profile_panel(message: types.Message):
     user_id = message.from_user.id
     await bot.delete_message(chat_id=user_id, message_id=message.message_id)
     try:
-        number = ...  # cur.execute('SELECT number FROM data WHERE id == ?', (message.from_user.id,)).fetchone()[0]
-        if number:
+        user: TelegramUser = await user_db.select_user(user_id=user_id)
+        if user:
             await bot.send_message(
                 chat_id=user_id,
-                text=td.SUCCESS_LOGIN,
+                text=td.SUCCESS_LOGIN_USR.format(user.name),
                 reply_markup=await ik.user_questions()
             )
-    except Exception as e:
+    except Exception:
         await bot.send_message(
             chat_id=user_id,
             text=td.AUTHORIZATION,
@@ -77,7 +77,7 @@ async def check_phone(message: types.Message, state: FSMContext):
                         chat_id=user_id,
                         text=td.SUCCESS_LOGIN.format(
                             user.name,
-                            f"{'активный' if user.state == 1 else 'не активныйй'}"
+                            f"{' ожидания вопроса' if user.state == 1 else 'деактивирован'}"
                         ),
                         reply_markup=await ik.main_kurator_menu()
                     )
@@ -86,14 +86,14 @@ async def check_phone(message: types.Message, state: FSMContext):
                         chat_id=user_id,
                         text=td.SUCCESS_LOGIN.format(
                             user.name,
-                            f"{'активный' if user.state == 1 else 'не активныйй'}"
+                            f"{'активный' if user.state == 1 else 'не активный'}"
                         ),
                         reply_markup=await ik.main_nastavnik_menu()
                     )
                 return
         except Exception as e:
-            print("smt_here")
-            pass
+            print(e)
+
         await user_db.add_user(
             user_id=user_id,
             name=message.from_user.first_name,
@@ -130,7 +130,7 @@ async def _role_segregated_menu(message: types.Message, result, user: TelegramUs
                 chat_id=user_id,
                 text=td.SUCCESS_LOGIN.format(
                     user.name,
-                    f"{'активный' if user.state == 1 else 'не активныйй'}"
+                    f"{' ожидания вопроса' if user.state == 1 else ' деактивирован'}"
                 ),
                 reply_markup=await ik.main_kurator_menu()
             )
@@ -139,7 +139,7 @@ async def _role_segregated_menu(message: types.Message, result, user: TelegramUs
                 chat_id=user_id,
                 text=td.SUCCESS_LOGIN.format(
                     user.name,
-                    f"{'активный' if user.state == 1 else 'не активныйй'}"
+                    f"{'активный' if user.state == 1 else 'не активный'}"
                 ),
                 reply_markup=await ik.main_nastavnik_menu()
             )
@@ -161,7 +161,7 @@ async def set_user_state(call: types.CallbackQuery):
     user: TelegramUser = await user_db.select_user(user_id)
     if user.state == 1:
         new_state = 0
-    current_state = await user_db.update_user_state(
+    await user_db.update_user_state(
         user_id=user_id,
         state=new_state
     )
@@ -172,5 +172,5 @@ async def set_user_state(call: types.CallbackQuery):
         ),
         message_id=call.message.message_id,
         chat_id=user_id,
-        reply_markup= await ik.main_kurator_menu()
+        reply_markup=await ik.main_kurator_menu()
     )
