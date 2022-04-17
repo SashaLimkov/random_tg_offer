@@ -40,7 +40,7 @@ class UserQuestion(TimeBasedModel):
     state = models.CharField(max_length=100, verbose_name="Состояние", default="Открытый вопрос")
     rate = models.CharField(max_length=1, verbose_name="Оценка", null=True)
     feedback = models.CharField(max_length=5000, null=True)
-    mes_id = models.BigIntegerField(unique=False, null=True)
+    mes_id = models.CharField(max_length=20000, unique=False, default="")
 
 
 class PinnedMessage(TimeBasedModel):
