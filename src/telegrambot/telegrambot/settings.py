@@ -17,7 +17,7 @@ import sys
 
 sys.path.append(f"{sys.path[0].split('src')[0]}src")
 
-from bot.config import config
+from config import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
