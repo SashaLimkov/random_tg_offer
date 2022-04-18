@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from data import keyboards_data as kd
+from bot.data import keyboards_data as kd
 
 __all__ = [
     "user_auth",
@@ -29,10 +29,8 @@ async def user_questions():
 
 
 async def main_kurator_menu():
-    keyboard = InlineKeyboardMarkup(row_width=2)
+    keyboard = InlineKeyboardMarkup(row_width=1)
     keyboard.add(
-        InlineKeyboardButton(text=kd.AUTHORIZATION_TXT, callback_data=kd.AUTHORIZATION_CD),
-        InlineKeyboardButton(text=kd.PROFILE_PANEL_TXT, callback_data=kd.PROFILE_PANEL_CD),
         InlineKeyboardButton(text=kd.QUESTIONS_LIST_TXT, callback_data=kd.QUESTIONS_LIST_CD),
         InlineKeyboardButton(text=kd.KUR_ACTIVITY_TXT, callback_data=kd.KUR_ACTIVITY_CD),
     )
@@ -42,8 +40,6 @@ async def main_kurator_menu():
 async def main_nastavnik_menu():
     keyboard = InlineKeyboardMarkup(row_width=2)
     keyboard.add(
-        InlineKeyboardButton(text=kd.AUTHORIZATION_TXT, callback_data=kd.AUTHORIZATION_CD),
-        InlineKeyboardButton(text=kd.PROFILE_PANEL_TXT, callback_data=kd.PROFILE_PANEL_CD),
         InlineKeyboardButton(text=kd.QUESTIONS_LIST_TXT, callback_data=kd.QUESTIONS_LIST_CD),
     )
     return keyboard

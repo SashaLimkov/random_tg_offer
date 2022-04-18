@@ -1,5 +1,5 @@
 from aiogram import Dispatcher
-from handlers import user, admin
+from bot.handlers import user, admin
 
 
 def setup(dp: Dispatcher):
