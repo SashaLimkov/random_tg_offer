@@ -10,11 +10,12 @@ from usersupport.models import UserQuestion, TelegramUser
 
 async def get_my_questions(call: types.CallbackQuery):
     user_id = call.from_user.id
+    user = await user_db.select_user(user_id=user_id)
     await bot.edit_message_text(
         chat_id=user_id,
         text="Выберите ваш вопрос",
         message_id=call.message.message_id,
-        reply_markup=await ik.get_q_list(),
+        reply_markup=await ik.get_q_list(user),
     )
 
 

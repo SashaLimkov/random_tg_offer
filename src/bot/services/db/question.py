@@ -54,5 +54,5 @@ def add_mes_id(user, mes_id):
 
 
 @sync_to_async
-def all_q():
-    return UserQuestion.objects.filter(state="Вопрос закрыт").all()
+def all_q(user):
+    return UserQuestion.objects.filter(user=user, state="Вопрос закрыт").all()

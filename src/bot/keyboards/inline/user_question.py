@@ -44,9 +44,9 @@ async def is_get_answer():
     return keyboard
 
 
-async def get_q_list():
+async def get_q_list(user):
     keyboard = InlineKeyboardMarkup(row_width=1)
-    questions = await question_db.all_q()
+    questions = await question_db.all_q(user)
     for question in questions[:18]:
         quid = question.pk
         q = question.question
