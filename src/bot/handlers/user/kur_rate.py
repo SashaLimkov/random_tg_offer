@@ -5,6 +5,8 @@ from aiogram.types import ReplyKeyboardRemove
 import bot.config.config
 from bot.config.loader import bot
 from bot.keyboards import reply as rk
+from bot.keyboards import inline as ik
+from bot.data import text_data as td
 from bot.states import Rate
 from usersupport.models import TelegramUser, UserQuestion
 from bot.services.db import user as user_db
@@ -48,9 +50,11 @@ async def set_rate(call: types.CallbackQuery):
             text=text,
             reply_to_message_id=mes_id[m_list[0]]
         )  # вопрос наставнику
-        await bot.send_message(chat_id=call.from_user.id,
-                               text="В следующий раз просто напишите /start, чтобы начать с начала",
-                               reply_markup=ReplyKeyboardRemove())
+        await bot.send_message(
+            chat_id=user_id,
+            text=td.SUCCESS_LOGIN_USR.format(user.name),
+            reply_markup=await ik.user_questions()
+        )
 
 
 async def get_rate(message: types.Message, state: FSMContext):
@@ -88,6 +92,8 @@ async def get_rate(message: types.Message, state: FSMContext):
         reply_to_message_id=mes_id[m_list[0]]
     )  # вопрос наставнику
     await question_db.update_state(user=user, pk=question.pk)
-    await bot.send_message(chat_id=message.chat.id,
-                           text="В следующий раз просто напишите /start, чтобы начать с начала",
-                           reply_markup=ReplyKeyboardRemove())
+    await bot.send_message(
+        chat_id=user_id,
+        text=td.SUCCESS_LOGIN_USR.format(user.name),
+        reply_markup=await ik.user_questions()
+    )

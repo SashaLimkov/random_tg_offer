@@ -61,7 +61,12 @@ async def check_phone(message: types.Message, state: FSMContext):
         try:
             user: TelegramUser = await user_db.select_user(user_id)
             if user:
-                await user_db.update_user_phone(user_id=user_id, phone=phone_number)
+                try:
+                    await user_db.update_user_phone(user_id=user_id, phone=phone_number)
+                except:
+                    await bot.delete_message(message.chat.id, message.message_id)
+                    await bot.send_message(message.chat.id, "Пользователь с таким номером уже аторизован")
+                    return
                 await bot.delete_message(
                     chat_id=user_id,
                     message_id=message.message_id
@@ -93,16 +98,20 @@ async def check_phone(message: types.Message, state: FSMContext):
                 return
         except Exception as e:
             print(e)
+        if phone_number not in list(await user_db.get_phones()):
+            await user_db.add_user(
+                user_id=user_id,
+                name=message.from_user.first_name,
+                role="ученик",
+                phone_number=phone_number
+            )
+            user = await user_db.select_user(user_id=user_id)
+            result = dict(r.json())
+            await _role_segregated_menu(message, result, user)
+        else:
+            await bot.delete_message(message.chat.id, message.message_id)
+            await bot.send_message(message.chat.id, "Пользователь с таким номером уже аторизован")
 
-        await user_db.add_user(
-            user_id=user_id,
-            name=message.from_user.first_name,
-            role="ученик",
-            phone_number=phone_number
-        )
-        user = await user_db.select_user(user_id=user_id)
-        result = dict(r.json())
-        await _role_segregated_menu(message, result, user)
     else:
         await bot.send_message(
             chat_id=user_id,

@@ -12,6 +12,7 @@ def setup(dp: Dispatcher):
     dp.register_message_handler(setup_role.setup_user_role, filters.Command("setup"))
     dp.register_message_handler(setup_role.check_key, state=Role.secret_key)
     # user auth
+    dp.register_callback_query_handler(user_profile_panel.user_pp, lambda call: call.data=="back")
     dp.register_message_handler(user_authorization.get_profile_panel, filters.Command("lk"))
     dp.register_message_handler(user_authorization.user_authorization, filters.CommandStart())
     dp.register_callback_query_handler(

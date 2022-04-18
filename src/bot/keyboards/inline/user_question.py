@@ -42,10 +42,16 @@ async def is_get_answer():
 async def get_q_list():
     keyboard = InlineKeyboardMarkup(row_width=1)
     questions = await question_db.all_q()
-    for question in questions:
+    for question in questions[:18]:
         quid = question.pk
         q = question.question
         keyboard.add(
             InlineKeyboardButton(text=q, callback_data=f"quid_{quid}")
         )
+    keyboard.add(
+        InlineKeyboardButton(
+            text="Назад",
+            callback_data="back"
+        )
+    )
     return keyboard
