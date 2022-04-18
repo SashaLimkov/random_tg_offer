@@ -19,7 +19,7 @@ async def set_rate(call: types.CallbackQuery):
     rate = call.data.replace("r_", "")
     question: UserQuestion = await question_db.select_question(user=user)
 
-    await question_db.update_rate(user=user,pk=question.pk, rate=rate)
+    await question_db.update_rate(user=user, pk=question.pk, rate=rate)
     # await user_db.update_user_state(user_id=helper_id, state=1)
     print(question.rate)
     await bot.edit_message_reply_markup(chat_id=user_id, message_id=call.message.message_id)
@@ -50,6 +50,12 @@ async def set_rate(call: types.CallbackQuery):
             text=text,
             reply_to_message_id=mes_id[m_list[0]]
         )  # вопрос наставнику
+        mes = await bot.send_message(
+            chat_id=user_id,
+            text=td.SUCCESS_LOGIN_USR.format(user.name),
+            reply_markup=ReplyKeyboardRemove()
+        )
+        await bot.delete_message(user_id, mes.message_id)
         await bot.send_message(
             chat_id=user_id,
             text=td.SUCCESS_LOGIN_USR.format(user.name),
@@ -65,7 +71,7 @@ async def get_rate(message: types.Message, state: FSMContext):
     if message.text == "Не оставлять отзыв":
         await question_db.update_feedback(user=user, pk=question.pk, feedback="Пользователь не оставил отзыв")
     else:
-        await question_db.update_feedback(user=user,  pk=question.pk,feedback=message.text)
+        await question_db.update_feedback(user=user, pk=question.pk, feedback=message.text)
     helper_id = question.helper_id
     mes_id = eval(question.mes_id)
     kurators, mentors = await user_db.select_all_kurators_and_mentors()
@@ -92,6 +98,13 @@ async def get_rate(message: types.Message, state: FSMContext):
         reply_to_message_id=mes_id[m_list[0]]
     )  # вопрос наставнику
     await question_db.update_state(user=user, pk=question.pk)
+    mes = await bot.send_message(
+        chat_id=user_id,
+        text=td.SUCCESS_LOGIN_USR.format(user.name),
+        reply_markup=ReplyKeyboardRemove()
+    )
+    await bot.delete_message(user_id, mes.message_id)
+    await bot.delete_message(user_id, message.message_id)
     await bot.send_message(
         chat_id=user_id,
         text=td.SUCCESS_LOGIN_USR.format(user.name),
