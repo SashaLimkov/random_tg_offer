@@ -114,6 +114,7 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
         mes_id = str(sent_q_id_dict)
         await question_db.add_mes_id(user=user, mes_id=mes_id)
 
+
 # async def continue_question(message: types.Message):
 #     user_id = message.from_user.id
 #     user: TelegramUser = await user_db.select_user(user_id=user_id)
