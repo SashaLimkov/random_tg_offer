@@ -53,7 +53,7 @@ def select_all_users():
 @sync_to_async
 def select_all_kurators_and_mentors():
     kurators = TelegramUser.objects.filter(user_role="куратор").all()
-    mentors = TelegramUser.objects.filter(user_role="настваник").all()
+    mentors = TelegramUser.objects.filter(user_role="наставник").all()
     return kurators, mentors
 
 
