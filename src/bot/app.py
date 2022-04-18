@@ -24,6 +24,7 @@ def setup_django():
     settings.configure("telegrambot.settings")
     django.setup()
 
+
 if __name__ == "__main__":
     setup_django()
     executor.start_polling(

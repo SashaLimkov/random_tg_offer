@@ -12,10 +12,7 @@ def select_user(user_id) -> TelegramUser:
 def add_user(user_id, name, role, phone_number):
     try:
         return TelegramUser(
-            user_id=int(user_id),
-            name=name,
-            user_role=role,
-            phone=phone_number
+            user_id=int(user_id), name=name, user_role=role, phone=phone_number
         ).save()
     except Exception:
         return select_user(int(user_id))
@@ -29,7 +26,7 @@ def add_user_with_role(user_id, name, role, chat_id):
             name=name,
             user_role=role,
             chat_id=chat_id,
-            phone=user_id
+            phone=user_id,
         ).save()
     except Exception:
         return select_user(int(user_id))
@@ -73,9 +70,11 @@ def update_chanel_chat_id(user_id, chat_id):
 def update_chanel_id(chat_id, chanel_id):
     return TelegramUser.objects.filter(chat_id=chat_id).update(chanel_id=chanel_id)
 
+
 @sync_to_async
 def get_phones():
     return TelegramUser.objects.values_list("phone", flat=True)
+
 
 @sync_to_async
 def get_user_by_phone(phone):

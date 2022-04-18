@@ -22,7 +22,7 @@ async def create_user_question(call: types.CallbackQuery):
     await bot.edit_message_text(
         text=td.ASK_A_QUESTION,
         chat_id=call.from_user.id,
-        message_id=call.message.message_id
+        message_id=call.message.message_id,
     )
     await UserQuestion.waiting_for_user_question.set()
 
@@ -31,7 +31,7 @@ async def wrong_q(call: types.CallbackQuery, state: FSMContext):
     await bot.edit_message_text(
         text=td.ASK_A_QUESTION,
         chat_id=call.from_user.id,
-        message_id=call.message.message_id
+        message_id=call.message.message_id,
     )
     await state.finish()
     await UserQuestion.waiting_for_user_question.set()
@@ -44,7 +44,7 @@ async def is_right_question(message: types.Message, state: FSMContext):
     await bot.send_message(
         text=td.IS_IT_YOUR_QUESTION.format(question),
         chat_id=message.chat.id,
-        reply_markup=await ik.is_question_right()
+        reply_markup=await ik.is_question_right(),
     )
 
 
@@ -74,40 +74,22 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
     await UserQuestion.waiting_for_new_question.set()
     if user.user_role == "ученик":
         await bot.edit_message_text(
-            chat_id=user_id,
-            text=td.QUESTION_SENDED,
-            message_id=call.message.message_id
+            chat_id=user_id, text=td.QUESTION_SENDED, message_id=call.message.message_id
         )
         sent_q_id_dict = {}
         for kur in k_list:
-            m = await bot.send_message(
-                chat_id=k_list[kur],
-                text="."
-            )
+            m = await bot.send_message(chat_id=k_list[kur], text=".")
             mes = await bot.send_message(
                 chat_id=kur,
-                text=text.format(
-                    user.user_id,
-                    user.name,
-                    user.phone,
-                    user_question
-                )
+                text=text.format(user.user_id, user.name, user.phone, user_question),
             )
             sent_q_id_dict[k_list[kur]] = m.message_id + 1
             await bot.delete_message(chat_id=k_list[kur], message_id=m.message_id)
         for m in m_list:
-            me = await bot.send_message(
-                chat_id=m_list[m],
-                text="."
-            )
+            me = await bot.send_message(chat_id=m_list[m], text=".")
             mes = await bot.send_message(
                 chat_id=m,
-                text=text.format(
-                    user.user_id,
-                    user.name,
-                    user.phone,
-                    user_question
-                )
+                text=text.format(user.user_id, user.name, user.phone, user_question),
             )
             sent_q_id_dict[m_list[m]] = me.message_id + 1
             await bot.delete_message(chat_id=m_list[m], message_id=me.message_id)

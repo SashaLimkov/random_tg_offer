@@ -14,7 +14,7 @@ async def get_my_questions(call: types.CallbackQuery):
         chat_id=user_id,
         text="Выберите ваш вопрос",
         message_id=call.message.message_id,
-        reply_markup=await ik.get_q_list()
+        reply_markup=await ik.get_q_list(),
     )
 
 
@@ -25,7 +25,7 @@ async def user_pp(call: types.CallbackQuery):
         chat_id=user_id,
         text=td.SUCCESS_LOGIN_USR.format(user.name),
         message_id=call.message.message_id,
-        reply_markup=await ik.user_questions()
+        reply_markup=await ik.user_questions(),
     )
 
 
@@ -37,5 +37,5 @@ async def show_q_info(call: types.CallbackQuery):
     await bot.edit_message_text(
         text=f"История:\n{q.history}\n Оценка:{'🌟' * int(q.rate)}\nОтзыв: {q.feedback}\n Напишите /lk, чтобы продолжить пользоваться",
         chat_id=user_id,
-        message_id=call.message.message_id
+        message_id=call.message.message_id,
     )
