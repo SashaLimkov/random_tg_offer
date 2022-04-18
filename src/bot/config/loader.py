@@ -7,6 +7,5 @@ bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 user_data = {}
-kurators_state={}
 
 
