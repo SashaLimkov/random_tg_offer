@@ -1,20 +1,8 @@
 from aiogram import types
-from aiogram.dispatcher import FSMContext
 
-from bot.config import config
-from bot.config.loader import bot, user_data
-from bot.data import text_data as td
-from bot.keyboards import reply as rk
-from bot.keyboards import inline as ik
-from usersupport.models import TelegramUser, UserQuestion
-from bot.services.db import user as user_db
-from bot.services.db import question as question_db
-from bot.states import UserQuestion as StateUserQuestion
-
-all = [
-    "get_answer",
-    "new_question",
-]
+from src.bot.config.loader import bot
+from src.bot.data import text_data as td
+from src.bot.keyboards import inline as ik
 
 
 async def get_answer(message: types.Message):
@@ -232,3 +220,17 @@ async def answer_done(call: types.CallbackQuery, state: FSMContext):
 #         chat_id=-1001741967870,
 #         text=td.USER_QUSTION.format(message.from_user.id, number, message.text)
 #     )
+=======
+    # print(user_data[message.from_user.id])
+    user_id = message.reply_to_message.text.split("\n")[0]
+    user_question = message.reply_to_message.text.split("\n\n")[1]
+    mentors_answer = message.text
+    await bot.send_message(
+        chat_id=user_id,
+        text=td.MENTORS_ANSWER.format(user_question, mentors_answer),
+        reply_markup=await ik.is_get_answer(),
+    )
+
+
+async def echo(call: types.CallbackQuery):
+    print(call.data)

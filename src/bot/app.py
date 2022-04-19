@@ -1,12 +1,8 @@
-import os
-
-import django
 from aiogram import Dispatcher
 from aiogram.utils import executor
-from django.conf import settings
 
-import handlers
-from config.loader import dp
+from src.bot import handlers
+from src.bot.config.loader import dp
 
 
 async def on_startup(dispatcher: Dispatcher):
@@ -26,7 +22,6 @@ def setup_django():
 
 
 if __name__ == "__main__":
-    setup_django()
     executor.start_polling(
         dp, on_startup=on_startup, on_shutdown=on_shutdown, skip_updates=False
     )
