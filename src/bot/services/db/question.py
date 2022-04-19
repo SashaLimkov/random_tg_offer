@@ -53,6 +53,7 @@ def add_mes_id(user, mes_id):
     return UserQuestion.objects.filter(user=user).update(mes_id=mes_id)
 
 
+
 @sync_to_async
 def all_q(user):
     return UserQuestion.objects.filter(user=user, state="Вопрос закрыт").all()
