@@ -33,7 +33,7 @@ async def get_answer(message: types.Message):
         )  # поставили состояние у куратора "отвечает на вопрос"
 
         await question_db.add_helper(
-            user=user, helper_id=helper_id
+            user=user, pk=user.id, helper_id=helper_id
         )  # Добавили вопросу id отвечающего на него
         kurators, mentors = await user_db.select_all_kurators_and_mentors()
         m_list = [m.chat_id for m in mentors]
@@ -43,7 +43,7 @@ async def get_answer(message: types.Message):
             if m_chat_id in m:
                 mes_id.update({m_chat_id: m[m_chat_id]})
         await question_db.add_mes_id(
-            user=user, mes_id=str(mes_id)
+            user=user, pk=user.id, mes_id=str(mes_id)
         )  # запомнили id чатов и сообщений с вопросом пользователя у куратора, являющегося хэлпером
         # (удалили id с других чатов) и ментора
         await bot.send_message(
@@ -202,7 +202,6 @@ async def answer_done(call: types.CallbackQuery, state: FSMContext):
         text="Поставьте оценку",
         reply_markup=await ik.set_kurators_rate(),
     )
-
 
 # kur_mess_id = ...  # cur.execute('SELECT kurmes FROM data WHERE id == ?', (message.from_user.id,)).fetchone()[
 # # 0]
