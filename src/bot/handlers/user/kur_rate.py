@@ -5,6 +5,8 @@ from aiogram.types import ReplyKeyboardRemove
 import bot.config.config
 from bot.config.loader import bot
 from bot.keyboards import reply as rk
+from bot.keyboards import inline as ik
+from bot.data import text_data as td
 from bot.states import Rate
 from usersupport.models import TelegramUser, UserQuestion
 from bot.services.db import user as user_db
@@ -17,7 +19,7 @@ async def set_rate(call: types.CallbackQuery):
     rate = call.data.replace("r_", "")
     question: UserQuestion = await question_db.select_question(user=user)
 
-    await question_db.update_rate(user=user,pk=question.pk, rate=rate)
+    await question_db.update_rate(user=user, pk=question.pk, rate=rate)
     # await user_db.update_user_state(user_id=helper_id, state=1)
     print(question.rate)
     await bot.edit_message_reply_markup(chat_id=user_id, message_id=call.message.message_id)
@@ -38,19 +40,27 @@ async def set_rate(call: types.CallbackQuery):
         m_list = [m.chat_id for m in mentors]
         text = f"Пользователь закрыл вопрос.\nОценка пользователя:{'🌟' * int(question.rate)}\nОтзыв: {question.feedback}"
         await question_db.update_state(user=user, pk=question.pk)
-        await bot.send_message(
-            chat_id=k_list[helper_id],
-            text=text,
-            reply_to_message_id=mes_id[k_list[helper_id]]
-        )  # вопрос к куратору
+        # await bot.send_message(
+        #     chat_id=k_list[helper_id],
+        #     text=text,
+        #     reply_to_message_id=mes_id[k_list[helper_id]]
+        # )  # вопрос к куратору
         await bot.send_message(
             chat_id=m_list[0],
             text=text,
             reply_to_message_id=mes_id[m_list[0]]
         )  # вопрос наставнику
-        await bot.send_message(chat_id=call.from_user.id,
-                               text="В следующий раз просто напишите /start, чтобы начать с начала",
-                               reply_markup=ReplyKeyboardRemove())
+        mes = await bot.send_message(
+            chat_id=user_id,
+            text=td.SUCCESS_LOGIN_USR.format(user.name),
+            reply_markup=ReplyKeyboardRemove()
+        )
+        await bot.delete_message(user_id, mes.message_id)
+        await bot.send_message(
+            chat_id=user_id,
+            text=td.SUCCESS_LOGIN_USR.format(user.name),
+            reply_markup=await ik.user_questions()
+        )
 
 
 async def get_rate(message: types.Message, state: FSMContext):
@@ -61,7 +71,7 @@ async def get_rate(message: types.Message, state: FSMContext):
     if message.text == "Не оставлять отзыв":
         await question_db.update_feedback(user=user, pk=question.pk, feedback="Пользователь не оставил отзыв")
     else:
-        await question_db.update_feedback(user=user,  pk=question.pk,feedback=message.text)
+        await question_db.update_feedback(user=user, pk=question.pk, feedback=message.text)
     helper_id = question.helper_id
     mes_id = eval(question.mes_id)
     kurators, mentors = await user_db.select_all_kurators_and_mentors()
@@ -69,25 +79,34 @@ async def get_rate(message: types.Message, state: FSMContext):
     m_list = [m.chat_id for m in mentors]
     question: UserQuestion = await question_db.select_question(user=user)
     text = f"Пользователь закрыл вопрос.\nОценка пользователя:{'🌟' * int(question.rate)}\nОтзыв: {question.feedback}"
-    try:
-        await bot.send_message(
-            chat_id=k_list[helper_id],
-            text=text,
-            reply_to_message_id=mes_id[k_list[helper_id]]
-        )  # вопрос к куратору
-    except:
-        for kur in k_list:
-            await bot.send_message(
-                chat_id=k_list[kur],
-                text=text,
-                reply_to_message_id=mes_id[k_list[kur]]
-            )  # вопрос к кураторам
+    # try:
+    #     await bot.send_message(
+    #         chat_id=k_list[helper_id],
+    #         text=text,
+    #         reply_to_message_id=mes_id[k_list[helper_id]]
+    #     )  # вопрос к куратору
+    # except:
+    #     for kur in k_list:
+    #         await bot.send_message(
+    #             chat_id=k_list[kur],
+    #             text=text,
+    #             reply_to_message_id=mes_id[k_list[kur]]
+    #         )  # вопрос к кураторам
     await bot.send_message(
         chat_id=m_list[0],
         text=text,
         reply_to_message_id=mes_id[m_list[0]]
     )  # вопрос наставнику
     await question_db.update_state(user=user, pk=question.pk)
-    await bot.send_message(chat_id=message.chat.id,
-                           text="В следующий раз просто напишите /start, чтобы начать с начала",
-                           reply_markup=ReplyKeyboardRemove())
+    mes = await bot.send_message(
+        chat_id=user_id,
+        text=td.SUCCESS_LOGIN_USR.format(user.name),
+        reply_markup=ReplyKeyboardRemove()
+    )
+    await bot.delete_message(user_id, mes.message_id)
+    await bot.delete_message(user_id, message.message_id)
+    await bot.send_message(
+        chat_id=user_id,
+        text=td.SUCCESS_LOGIN_USR.format(user.name),
+        reply_markup=await ik.user_questions()
+    )

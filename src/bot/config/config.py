@@ -17,4 +17,4 @@ NASTAVNIK_SECRET_KEY = os.getenv("NASTAVNIK_SECRET_KEY")
 POSTGRES_URI = f"postgresql://{PGUSER}:{PGPASSWORD}@{DBHOST}/{DATABASE}"
 
 # if __name__ == '__main__':
-    # print(NASTAVNIK_SECRET_KEY)
+# print(NASTAVNIK_SECRET_KEY)
