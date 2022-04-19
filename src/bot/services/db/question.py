@@ -44,13 +44,13 @@ def update_feedback(user, pk, feedback):
 
 
 @sync_to_async
-def add_helper(user, helper_id):
-    return UserQuestion.objects.filter(user=user).update(helper_id=helper_id)
+def add_helper(user, pk, helper_id):
+    return UserQuestion.objects.filter(user=user, pk=pk).update(helper_id=helper_id)
 
 
 @sync_to_async
-def add_mes_id(user, mes_id):
-    return UserQuestion.objects.filter(user=user).update(mes_id=mes_id)
+def add_mes_id(user, mes_id, pk):
+    return UserQuestion.objects.filter(user=user, pk=pk).update(mes_id=mes_id)
 
 
 @sync_to_async
