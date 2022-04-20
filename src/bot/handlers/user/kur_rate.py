@@ -53,9 +53,9 @@ async def set_rate(call: types.CallbackQuery):
         except:
             for kur in k_list:
                 await bot.send_message(
-                    chat_id=k_list[helper_id],
+                    chat_id=k_list[kur],
                     text="Пользователь закрыл вопрос",
-                    reply_to_message_id=mes_id[k_list[helper_id]]
+                    reply_to_message_id=mes_id[k_list[kur]]
                 )  # вопрос к куратору
         await bot.send_message(
             chat_id=m_list[0], text=text, reply_to_message_id=mes_id[m_list[0]]
