@@ -57,8 +57,9 @@ async def get_answer(message: types.Message):
         try:
             await bot.delete_message(
                 chat_id=user_id,
-                message_id=user_mes[mes_id]
+                message_id=user_mes[user_id]
             )
+            del user_mes[user_id]
         except Exception as e:
             print("222222222222222222222222222222222222222222222")
             print(e)
@@ -116,6 +117,7 @@ async def get_answer(message: types.Message):
             chat_id=user_id,
             message_id=user_mes[mes_id]
         )
+        del user_mes[user_id]
     except Exception as e:
         print("11111111111111111111111111111111111111111111111111")
         print(e)
@@ -201,9 +203,11 @@ async def send_new_question(call: types.CallbackQuery, state: FSMContext):
             chat_id=user_id,
             message_id=user_mes[user_id]
         )
+        del user_mes[user_id]
     except:
         pass
-    await bot.send_message(chat_id=user_id, text=td.QUESTION_SENDED, reply_markup=await ik.answer_done())
+    mes = await bot.send_message(chat_id=user_id, text=td.QUESTION_SENDED, reply_markup=await ik.answer_done())
+    user_mes[user_id] = mes.message_id
 
 
 async def answer_done(call: types.CallbackQuery, state: FSMContext):
