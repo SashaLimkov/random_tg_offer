@@ -76,27 +76,6 @@ def setup(dp: Dispatcher):
         user_answers.get_answer, lambda message: message.reply_to_message
     )
     dp.register_callback_query_handler(
-        user_answers.new_question,
-        lambda call: call.data == kd.APPEND_QUESTION_CD,
-        state="*",
-    )
-    dp.register_message_handler(
-        user_answers.is_right_new_question,
-        content_types=types.ContentTypes.ANY,
-        state=UserQuestion.waiting_for_new_question
-    )
-    dp.register_callback_query_handler(
-        user_answers.wrong_question,
-        lambda call: call.data == kd.NEW_WRONG_QUESTION_CD,
-        state=UserQuestion.waiting_for_new_question,
-    )
-    dp.register_callback_query_handler(
-        user_answers.send_new_question,
-        lambda call: call.data == kd.NEW_RIGHT_QUESTION_CD,
-        content_types=types.ContentTypes.ANY,
-        state=UserQuestion.waiting_for_new_question,
-    )
-    dp.register_callback_query_handler(
         user_answers.answer_done, lambda call: call.data == kd.ANSWER_DONE_CD, state="*"
     )
     dp.register_callback_query_handler(
