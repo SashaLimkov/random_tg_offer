@@ -171,24 +171,31 @@ async def is_right_new_question(message: types.Message, state: FSMContext):
     if message.media_group_id:
         await bot.send_message(
             chat_id=user_id,
-            text= 'Вы можете отправить только текст с фотографией , либо по отдельности'
+            text='Вы можете отправить только текст с фотографией , либо по отдельности'
         )
         return
     elif message.photo:
-        question = message.caption
+        question = message.caption + f"|{message.photo[-1].file_id}" if message.caption else f"ВОПРОС С ФОТО|{message.photo[-1].file_id}"
         await bot.send_photo(
             chat_id=user_id,
             photo=message.photo[-1].file_id,
-            caption=question,
+            caption=td.IS_IT_YOUR_QUESTION.format(question),
             reply_markup=await ik.is_question_right()
         )
     elif message.document:
-        question = message.caption
+        question = message.caption + f"|{message.document.file_id}" if message.caption else f"ВОПРОС С ФОТО|{message.document.file_id}"
         await bot.send_document(
             chat_id=user_id,
             document=message.document.file_id,
-            caption=question,
+            caption=td.IS_IT_YOUR_QUESTION.format(question),
             reply_markup=await ik.is_question_right()
+        )
+    elif message.text:
+        question = message.text
+        await bot.send_message(
+            text=td.IS_IT_YOUR_QUESTION.format(question),
+            chat_id=message.chat.id,
+            reply_markup=await ik.is_question_right(),
         )
     else:
         await bot.send_message(
@@ -197,7 +204,6 @@ async def is_right_new_question(message: types.Message, state: FSMContext):
         )
         return
     await state.update_data(user_question=question)
-
 
 async def send_new_question(call: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()

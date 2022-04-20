@@ -54,11 +54,11 @@ async def is_right_question(message: types.Message, state: FSMContext):
     if message.media_group_id:
         await bot.send_message(
             chat_id=user_id,
-            text= 'Вы можете отправить только текст с фотографией , либо по отдельности'
+            text='Вы можете отправить только текст с фотографией , либо по отдельности'
         )
         return
     elif message.photo:
-        question = message.caption if message.caption else "."
+        question = message.caption+f"|{message.photo[-1].file_id}" if message.caption else f"ВОПРОС С ФОТО|{message.photo[-1].file_id}"
         await bot.send_photo(
             chat_id=user_id,
             photo=message.photo[-1].file_id,
@@ -66,7 +66,7 @@ async def is_right_question(message: types.Message, state: FSMContext):
             reply_markup=await ik.is_question_right()
         )
     elif message.document:
-        question = message.caption if message.caption else "."
+        question = message.caption+f"|{message.document.file_id}" if message.caption else f"ВОПРОС С ФОТО|{message.document.file_id}"
         await bot.send_document(
             chat_id=user_id,
             document=message.document.file_id,
@@ -74,7 +74,7 @@ async def is_right_question(message: types.Message, state: FSMContext):
             reply_markup=await ik.is_question_right()
         )
     elif message.text:
-        question = message.text if message.text else "."
+        question = message.text
         # await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
         await bot.send_message(
             text=td.IS_IT_YOUR_QUESTION.format(question),
@@ -84,7 +84,7 @@ async def is_right_question(message: types.Message, state: FSMContext):
     else:
         await bot.send_message(
             chat_id=user_id,
-            text= 'Вы можете отправить только текст с фотографией , либо по отдельности'
+            text='Вы можете отправить только текст с фотографией , либо по отдельности'
         )
         return
     await state.update_data(user_question=question)
@@ -92,7 +92,7 @@ async def is_right_question(message: types.Message, state: FSMContext):
 
 async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    user_question = data.get("user_question")
+    user_question = "ВОПРОС С ФОТО" if data.get("user_question") == "." else data.get("user_question")
     await state.finish()
     user_id = call.from_user.id
     user: TelegramUser = await user_db.select_user(user_id=user_id)
@@ -110,18 +110,16 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
         await question_db.add_question(user=user, question=user_question)
     q: ModelUserQuestion = await question_db.select_question(user=user)
     await question_db.add_history(user=user, pk=q.pk, history=history)
-    # if not k_list: если все кураторы заняты
-    #     random_kurator = random.choice(all_kurators_list)
-    #
     await UserQuestion.waiting_for_new_question.set()
     if user.user_role == "ученик":
         mes: types.Message = await bot.edit_message_text(
-            chat_id=user_id, text=td.QUESTION_SENDED, message_id=call.message.message_id,
+            chat_id=user_id,
+            text=td.QUESTION_SENDED,
+            message_id=call.message.message_id,
             reply_markup=await ik.answer_done()
         )
         user_mes[user_id] = mes.message_id
         sent_q_id_dict = {}
-        print(k_list)
         for kur in k_list:
             m = await bot.send_message(chat_id=k_list[kur], text=".")
             mes = await bot.send_message(
