@@ -143,14 +143,14 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                 await bot.send_photo(
                     chat_id=kur,
                     photo=k_file_id,
-                    caption=user_question,
+                    caption=text.format(user.user_id, user.name, user.phone, user_question),
                 )
             elif file_id.startswith("document"):
                 k_file_id = file_id.replace("document", "")
                 await bot.send_document(
                     chat_id=kur,
                     document=k_file_id,
-                    caption=user_question,
+                    caption=text.format(user.user_id, user.name, user.phone, user_question),
                 )
             sent_q_id_dict[k_list[kur]] = m.message_id + 1
             await bot.delete_message(chat_id=k_list[kur], message_id=m.message_id)
@@ -166,14 +166,14 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                 await bot.send_photo(
                     chat_id=m,
                     photo=m_file_id,
-                    caption=user_question,
+                    caption=text.format(user.user_id, user.name, user.phone, user_question),
                 )
             elif file_id.startswith("document"):
                 m_file_id = file_id.replace("document", "")
                 await bot.send_document(
                     chat_id=m,
                     document=m_file_id,
-                    caption=user_question,
+                    caption=text.format(user.user_id, user.name, user.phone, user_question),
                 )
             sent_q_id_dict[m_list[m]] = me.message_id + 1
             await bot.delete_message(chat_id=m_list[m], message_id=me.message_id)
