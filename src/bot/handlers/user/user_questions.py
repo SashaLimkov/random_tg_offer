@@ -136,7 +136,7 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                 await bot.send_photo(
                     chat_id=m_list[0],
                     photo=k_file_id,
-                    text=f"{user.name}: {user_question}",
+                    caption=f"{user.name}: {user_question}",
                     reply_to_message_id=mes_id[m_list[0]],
                 )  # вопрос наставнику
             elif file_id.startswith("document"):
@@ -178,7 +178,7 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                     await bot.send_photo(
                         chat_id=m_list[0],
                         photo=k_file_id,
-                        text=f"{user.name}: {user_question}",
+                        caption=f"{user.name}: {user_question}",
                         reply_to_message_id=mes_id[m_list[0]],
                     )  # вопрос наставник
                 elif file_id.startswith("document"):
