@@ -52,29 +52,35 @@ async def wrong_q(call: types.CallbackQuery, state: FSMContext):
 async def is_right_question(message: types.Message, state: FSMContext):
     user_id = message.chat.id
     if message.photo:
-        question = message.caption
+        question = message.caption if message.caption else "."
         await bot.send_photo(
             chat_id=user_id,
             photo=message.photo[-1].file_id,
-            caption=question,
+            caption=td.IS_IT_YOUR_QUESTION.format(question),
             reply_markup=await ik.is_question_right()
         )
     elif message.document:
-        question = message.caption
+        question = message.caption if message.caption else "."
         await bot.send_document(
             chat_id=user_id,
             document=message.document.file_id,
-            caption=question,
+            caption=td.IS_IT_YOUR_QUESTION.format(question),
             reply_markup=await ik.is_question_right()
         )
-    else:
-        question = message.text
+    elif message.text:
+        question = message.text if message.text else "."
         # await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
         await bot.send_message(
             text=td.IS_IT_YOUR_QUESTION.format(question),
             chat_id=message.chat.id,
             reply_markup=await ik.is_question_right(),
         )
+    else:
+        await bot.delete_message(
+            chat_id=user_id,
+            message_id=message.chat.id
+        )
+        return
     await state.update_data(user_question=question)
 
 

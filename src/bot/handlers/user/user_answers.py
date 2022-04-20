@@ -145,23 +145,55 @@ async def new_question(call: types.CallbackQuery, state: FSMContext):
 
 
 async def wrong_question(call: types.CallbackQuery, state: FSMContext):
-    await bot.edit_message_text(
-        text=td.ASK_A_QUESTION,
-        chat_id=call.from_user.id,
-        message_id=call.message.message_id,
-    )
+    user_id = call.from_user.id
+    mes_id = call.message.message_id
+    try:
+        await bot.edit_message_text(
+            text=td.ASK_A_QUESTION,
+            chat_id=user_id,
+            message_id=mes_id,
+        )
+    except Exception:
+        await bot.delete_message(
+            chat_id=user_id,
+            message_id=mes_id
+        )
+        await bot.send_message(
+            text=td.ASK_A_QUESTION,
+            chat_id=user_id,
+        )
     await state.finish()
     await StateUserQuestion.waiting_for_new_question.set()
 
 
 async def is_right_new_question(message: types.Message, state: FSMContext):
-    question = message.text
+    user_id = message.chat.id
+    if message.photo:
+        question = message.caption
+        await bot.send_photo(
+            chat_id=user_id,
+            photo=message.photo[-1].file_id,
+            caption=question,
+            reply_markup=await ik.is_question_right()
+        )
+    elif message.document:
+        question = message.caption
+        await bot.send_document(
+            chat_id=user_id,
+            document=message.document.file_id,
+            caption=question,
+            reply_markup=await ik.is_question_right()
+        )
+    else:
+        question = message.text
+        # await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+        await bot.send_message(
+            text=td.IS_IT_YOUR_QUESTION.format(question),
+            chat_id=message.chat.id,
+            reply_markup=await ik.is_question_right(),
+        )
+
     await state.update_data(user_question=question)
-    await bot.send_message(
-        text=td.IS_IT_YOUR_QUESTION.format(question),
-        chat_id=message.chat.id,
-        reply_markup=await ik.is_new_question_right(),
-    )
 
 
 async def send_new_question(call: types.CallbackQuery, state: FSMContext):
