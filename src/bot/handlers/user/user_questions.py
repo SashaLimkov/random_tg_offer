@@ -39,7 +39,7 @@ async def wrong_q(call: types.CallbackQuery, state: FSMContext):
 
 async def is_right_question(message: types.Message, state: FSMContext):
     user_id = message.chat.id
-    if message.photo is not None:
+    if message.photo :
         question = message.caption
         await bot.send_photo(
             chat_id=user_id,
@@ -47,7 +47,7 @@ async def is_right_question(message: types.Message, state: FSMContext):
             caption=question,
             reply_markup=await ik.is_question_right()
         )
-    elif message.document is not None:
+    elif message.document :
         question = message.caption
         await bot.send_document(
             chat_id=user_id,

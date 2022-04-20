@@ -115,7 +115,7 @@ async def get_answer(message: types.Message):
     try:
         await bot.delete_message(
             chat_id=user_id,
-            message_id=user_mes[mes_id]
+            message_id=user_mes[user_id]
         )
         del user_mes[user_id]
     except Exception as e:
