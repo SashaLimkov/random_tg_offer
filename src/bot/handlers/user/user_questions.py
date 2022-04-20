@@ -139,14 +139,14 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                     text=text.format(user.user_id, user.name, user.phone, user_question),
                 )
             elif file_id.startswith("photo"):
-                file_id.replace("photo", "")
+                file_id = file_id.replace("photo", "")
                 await bot.send_photo(
                     chat_id=kur,
                     photo=file_id,
                     caption=user_question,
                 )
             elif file_id.startswith("document"):
-                file_id.replace("document", "")
+                file_id = file_id.replace("document", "")
                 await bot.send_document(
                     chat_id=kur,
                     document=file_id,
@@ -162,14 +162,14 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                     text=text.format(user.user_id, user.name, user.phone, user_question),
                 )
             elif file_id.startswith("photo"):
-                file_id.replace("photo", "")
+                file_id = file_id.replace("photo", "")
                 await bot.send_photo(
                     chat_id=m,
                     photo=file_id,
                     caption=user_question,
                 )
             elif file_id.startswith("document"):
-                file_id.replace("document", "")
+                file_id = file_id.replace("document", "")
                 await bot.send_document(
                     chat_id=m,
                     document=file_id,
