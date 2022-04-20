@@ -81,7 +81,9 @@ def setup(dp: Dispatcher):
         state="*",
     )
     dp.register_message_handler(
-        user_answers.is_right_new_question, state=UserQuestion.waiting_for_new_question
+        user_answers.is_right_new_question,
+        content_types=types.ContentTypes.ANY,
+        state=UserQuestion.waiting_for_new_question
     )
     dp.register_callback_query_handler(
         user_answers.wrong_question,
