@@ -51,7 +51,13 @@ async def wrong_q(call: types.CallbackQuery, state: FSMContext):
 
 async def is_right_question(message: types.Message, state: FSMContext):
     user_id = message.chat.id
-    if message.photo:
+    if message.media_group_id:
+        await bot.send_message(
+            chat_id=user_id,
+            text= 'Вы можете отправить только текст с фотографией , либо по отдельности'
+        )
+        return
+    elif message.photo:
         question = message.caption if message.caption else "."
         await bot.send_photo(
             chat_id=user_id,
@@ -76,9 +82,9 @@ async def is_right_question(message: types.Message, state: FSMContext):
             reply_markup=await ik.is_question_right(),
         )
     else:
-        await bot.delete_message(
+        await bot.send_message(
             chat_id=user_id,
-            message_id=message.chat.id
+            text= 'Вы можете отправить только текст с фотографией , либо по отдельности'
         )
         return
     await state.update_data(user_question=question)
