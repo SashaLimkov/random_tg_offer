@@ -110,6 +110,13 @@ async def get_answer(message: types.Message):
         )
     except Exception as e:
         print(e)
+    try:
+        await bot.delete_message(
+            chat_id=user_id,
+            message_id=user_mes[mes_id]
+        )
+    except:
+        pass
     mes = await bot.send_message(
         chat_id=user.user_id, text=f"{answer}", reply_markup=await ik.is_get_answer()
     )
