@@ -18,7 +18,10 @@ all = [
 
 
 async def get_answer(message: types.Message):
-    user_id = int(message.reply_to_message.text.split("\n")[0])
+    if message.reply_to_message.caption:
+        user_id = int(message.reply_to_message.caption.split("\n")[0])
+    else:
+        user_id = int(message.reply_to_message.text.split("\n")[0])
     user: TelegramUser = await user_db.select_user(
         user_id=user_id
     )  # юзер задавший вопрос
@@ -175,19 +178,19 @@ async def is_right_new_question(message: types.Message, state: FSMContext):
         )
         return
     elif message.photo:
-        question = message.caption + f"|{message.photo[-1].file_id}" if message.caption else f"ВОПРОС С ФОТО|{message.photo[-1].file_id}"
+        question = message.caption + f"|photo{message.photo[-1].file_id}" if message.caption else f"ВОПРОС С ФОТО|photo{message.photo[-1].file_id}"
         await bot.send_photo(
             chat_id=user_id,
             photo=message.photo[-1].file_id,
-            caption=td.IS_IT_YOUR_QUESTION.format(question),
+            caption=td.IS_IT_YOUR_QUESTION.format(question.split("|")[0]),
             reply_markup=await ik.is_question_right()
         )
     elif message.document:
-        question = message.caption + f"|{message.document.file_id}" if message.caption else f"ВОПРОС С ФОТО|{message.document.file_id}"
+        question = message.caption + f"|document{message.document.file_id}" if message.caption else f"ВОПРОС С ФОТО|document{message.document.file_id}"
         await bot.send_document(
             chat_id=user_id,
             document=message.document.file_id,
-            caption=td.IS_IT_YOUR_QUESTION.format(question),
+            caption=td.IS_IT_YOUR_QUESTION.format(question.split("|")[0]),
             reply_markup=await ik.is_question_right()
         )
     elif message.text:
@@ -205,9 +208,10 @@ async def is_right_new_question(message: types.Message, state: FSMContext):
         return
     await state.update_data(user_question=question)
 
+
 async def send_new_question(call: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
-    user_question = data.get("user_question")
+    user_question, file_id = data.get("user_question").split('|')
     await state.finish()
     user_id = call.from_user.id
     user: TelegramUser = await user_db.select_user(user_id=user_id)
@@ -221,23 +225,97 @@ async def send_new_question(call: types.CallbackQuery, state: FSMContext):
     k_list = {k.user_id: k.chat_id for k in kurators}
     m_list = [m.chat_id for m in mentors]
     try:
-        await bot.send_message(
-            chat_id=k_list[helper_id],
-            text=f"{user.name}: {user_question}",
-            reply_to_message_id=mes_id[k_list[helper_id]],
-        )  # вопрос к куратору
+        if file_id.startswith("."):
+            await bot.send_message(
+                chat_id=k_list[helper_id],
+                text=f"{user.name}: {user_question}",
+                reply_to_message_id=mes_id[k_list[helper_id]],
+            )
+            await bot.send_message(
+                chat_id=m_list[0],
+                text=f"{user.name}: {user_question}",
+                reply_to_message_id=mes_id[m_list[0]],
+            )  # вопрос наставнику
+        elif file_id.startswith("photo"):
+            k_file_id = file_id.replace("photo", "")
+            await bot.send_photo(
+                chat_id=k_list[helper_id],
+                photo=k_file_id,
+                caption=f"{user.name}: {user_question}",
+                reply_to_message_id=mes_id[k_list[helper_id]],
+            )
+            await bot.send_photo(
+                chat_id=m_list[0],
+                photo=k_file_id,
+                text=f"{user.name}: {user_question}",
+                reply_to_message_id=mes_id[m_list[0]],
+            )  # вопрос наставнику
+        elif file_id.startswith("document"):
+            k_file_id = file_id.replace("document", "")
+            await bot.send_document(
+                chat_id=k_list[helper_id],
+                document=k_file_id,
+                caption=f"{user.name}: {user_question}",
+                reply_to_message_id=mes_id[k_list[helper_id]],
+            )
+            await bot.send_document(
+                chat_id=m_list[0],
+                document=k_file_id,
+                text=f"{user.name}: {user_question}",
+                reply_to_message_id=mes_id[m_list[0]],
+            )  # вопрос наставнику
+        # await bot.send_message(
+        #     chat_id=k_list[helper_id],
+        #     text=f"{user.name}: {user_question}",
+        #     reply_to_message_id=mes_id[k_list[helper_id]],
+        # )  # вопрос к куратору
     except:
         for kur in k_list:
-            await bot.send_message(
-                chat_id=k_list[kur],
-                text=f"{user.name}: {user_question}",
-                reply_to_message_id=mes_id[k_list[kur]],
-            )  # вопрос к кураторам
-    await bot.send_message(
-        chat_id=m_list[0],
-        text=f"{user.name}: {user_question}",
-        reply_to_message_id=mes_id[m_list[0]],
-    )  # вопрос наставнику
+            if file_id.startswith("."):
+                await bot.send_message(
+                    chat_id=k_list[kur],
+                    text=f"{user.name}: {user_question}",
+                    reply_to_message_id=mes_id[k_list[kur]],
+                )
+                await bot.send_message(
+                    chat_id=m_list[0],
+                    text=f"{user.name}: {user_question}",
+                    reply_to_message_id=mes_id[m_list[0]],
+                )  # вопрос наставнику
+            elif file_id.startswith("photo"):
+                k_file_id = file_id.replace("photo", "")
+                await bot.send_photo(
+                    chat_id=k_list[kur],
+                    photo=k_file_id,
+                    caption=f"{user.name}: {user_question}",
+                    reply_to_message_id=mes_id[k_list[kur]],
+                )
+                await bot.send_photo(
+                    chat_id=m_list[0],
+                    photo=k_file_id,
+                    text=f"{user.name}: {user_question}",
+                    reply_to_message_id=mes_id[m_list[0]],
+                )  # вопрос наставник
+            elif file_id.startswith("document"):
+                k_file_id = file_id.replace("document", "")
+                await bot.send_document(
+                    chat_id=k_list[kur],
+                    document=k_file_id,
+                    caption=f"{user.name}: {user_question}",
+                    reply_to_message_id=mes_id[k_list[kur]],
+                )
+                await bot.send_document(
+                    chat_id=m_list[0],
+                    document=k_file_id,
+                    text=f"{user.name}: {user_question}",
+                    reply_to_message_id=mes_id[m_list[0]],
+                )
+
+            # await bot.send_message(
+            #     chat_id=k_list[kur],
+            #     text=f"{user.name}: {user_question}",
+            #     reply_to_message_id=mes_id[k_list[kur]],
+            # )  # вопрос к кураторам
     await bot.delete_message(chat_id=user_id, message_id=call.message.message_id)
     try:
         await bot.delete_message(

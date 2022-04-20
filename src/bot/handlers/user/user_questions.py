@@ -134,7 +134,7 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
         for kur in k_list:
             m = await bot.send_message(chat_id=k_list[kur], text=".")
             if file_id.startswith("."):
-                mes = await bot.send_message(
+                await bot.send_message(
                     chat_id=kur,
                     text=text.format(user.user_id, user.name, user.phone, user_question),
                 )
@@ -157,7 +157,7 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
         for m in m_list:
             me = await bot.send_message(chat_id=m_list[m], text=".")
             if file_id.startswith("."):
-                mes = await bot.send_message(
+                await bot.send_message(
                     chat_id=m,
                     text=text.format(user.user_id, user.name, user.phone, user_question),
                 )
