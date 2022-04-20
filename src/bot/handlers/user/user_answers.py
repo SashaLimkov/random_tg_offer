@@ -54,6 +54,13 @@ async def get_answer(message: types.Message):
         answer = message.text
         history = f"{question.history}A: {answer}\n"
         await question_db.add_history(user=user, pk=question.pk, history=history)
+        try:
+            await bot.delete_message(
+                chat_id=user_id,
+                message_id=user_mes[mes_id]
+            )
+        except:
+            pass
         mes = await bot.send_message(
             chat_id=user.user_id,
             text=f"{answer}",  # тут можно написать ОТВЕТ ОТ КУРАТОРА перед ответом для юзера
