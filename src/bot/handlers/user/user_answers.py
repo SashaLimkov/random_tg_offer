@@ -31,6 +31,8 @@ async def get_answer(message: types.Message):
     )  # куратор ответивший
     question: UserQuestion = await question_db.select_question(user=user)  # вопрос
     if helper.state == 1 and helper.user_role == "куратор":
+        if not question:
+            return
         await user_db.update_user_state(
             user_id=helper_id, state=0
         )  # поставили состояние у куратора "отвечает на вопрос"
