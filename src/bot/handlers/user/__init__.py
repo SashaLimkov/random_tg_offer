@@ -55,6 +55,7 @@ def setup(dp: Dispatcher):
     dp.register_callback_query_handler(
         user_questions.create_user_question,
         lambda call: call.data == kd.ASK_A_QUESTION_CD,
+        state="*"
     )
     dp.register_callback_query_handler(
         user_questions.wrong_q,
