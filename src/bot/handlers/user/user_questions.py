@@ -28,18 +28,30 @@ async def create_user_question(call: types.CallbackQuery):
 
 
 async def wrong_q(call: types.CallbackQuery, state: FSMContext):
-    await bot.edit_message_text(
-        text=td.ASK_A_QUESTION,
-        chat_id=call.from_user.id,
-        message_id=call.message.message_id,
-    )
+    user_id = call.from_user.id
+    mes_id = call.message.message_id
+    try:
+        await bot.edit_message_text(
+            text=td.ASK_A_QUESTION,
+            chat_id=user_id,
+            message_id=mes_id,
+        )
+    except Exception:
+        await bot.delete_message(
+            chat_id=user_id,
+            message_id=mes_id
+        )
+        await bot.send_message(
+            text=td.ASK_A_QUESTION,
+            chat_id=user_id,
+        )
     await state.finish()
     await UserQuestion.waiting_for_user_question.set()
 
 
 async def is_right_question(message: types.Message, state: FSMContext):
     user_id = message.chat.id
-    if message.photo :
+    if message.photo:
         question = message.caption
         await bot.send_photo(
             chat_id=user_id,
@@ -47,7 +59,7 @@ async def is_right_question(message: types.Message, state: FSMContext):
             caption=question,
             reply_markup=await ik.is_question_right()
         )
-    elif message.document :
+    elif message.document:
         question = message.caption
         await bot.send_document(
             chat_id=user_id,
