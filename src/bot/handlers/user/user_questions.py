@@ -79,6 +79,7 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
         )
         user_mes[user_id] = mes.message_id
         sent_q_id_dict = {}
+        print(k_list)
         for kur in k_list:
             m = await bot.send_message(chat_id=k_list[kur], text=".")
             mes = await bot.send_message(
