@@ -93,6 +93,7 @@ def setup(dp: Dispatcher):
     dp.register_callback_query_handler(
         user_answers.send_new_question,
         lambda call: call.data == kd.NEW_RIGHT_QUESTION_CD,
+        content_types=types.ContentTypes.ANY,
         state=UserQuestion.waiting_for_new_question,
     )
     dp.register_callback_query_handler(
