@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from bot.config import config
-from bot.config.loader import bot, user_data
+from bot.config.loader import bot, user_data, user_mes
 from bot.data import text_data as td
 from bot.keyboards import reply as rk
 from bot.keyboards import inline as ik
@@ -180,7 +180,14 @@ async def send_new_question(call: types.CallbackQuery, state: FSMContext):
         reply_to_message_id=mes_id[m_list[0]],
     )  # вопрос наставнику
     await bot.delete_message(chat_id=user_id, message_id=call.message.message_id)
-    await bot.send_message(chat_id=user_id, text=td.QUESTION_SENDED)
+    try:
+        await bot.delete_message(
+            chat_id=user_id,
+            message_id=user_mes[user_id]
+        )
+    except:
+        pass
+    await bot.send_message(chat_id=user_id, text=td.QUESTION_SENDED, reply_markup=await ik.answer_done())
 
 
 async def answer_done(call: types.CallbackQuery, state: FSMContext):
@@ -202,7 +209,6 @@ async def answer_done(call: types.CallbackQuery, state: FSMContext):
         text="Поставьте оценку",
         reply_markup=await ik.set_kurators_rate(),
     )
-
 
 # kur_mess_id = ...  # cur.execute('SELECT kurmes FROM data WHERE id == ?', (message.from_user.id,)).fetchone()[
 # # 0]

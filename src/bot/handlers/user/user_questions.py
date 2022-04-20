@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from bot.config.loader import bot
+from bot.config.loader import bot, user_mes
 from bot.data import text_data as td
 from bot.keyboards import inline as ik
 from bot.services.db import question as question_db
@@ -73,10 +73,11 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
     #
     await UserQuestion.waiting_for_new_question.set()
     if user.user_role == "ученик":
-        await bot.edit_message_text(
+        mes: types.Message = await bot.edit_message_text(
             chat_id=user_id, text=td.QUESTION_SENDED, message_id=call.message.message_id,
             reply_markup=await ik.answer_done()
         )
+        user_mes[user_id] = mes.message_id
         sent_q_id_dict = {}
         for kur in k_list:
             m = await bot.send_message(chat_id=k_list[kur], text=".")
