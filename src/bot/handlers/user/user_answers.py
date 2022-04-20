@@ -59,8 +59,9 @@ async def get_answer(message: types.Message):
                 chat_id=user_id,
                 message_id=user_mes[mes_id]
             )
-        except:
-            pass
+        except Exception as e:
+            print("222222222222222222222222222222222222222222222")
+            print(e)
         mes = await bot.send_message(
             chat_id=user.user_id,
             text=f"{answer}",  # тут можно написать ОТВЕТ ОТ КУРАТОРА перед ответом для юзера
@@ -115,8 +116,9 @@ async def get_answer(message: types.Message):
             chat_id=user_id,
             message_id=user_mes[mes_id]
         )
-    except:
-        pass
+    except Exception as e:
+        print("11111111111111111111111111111111111111111111111111")
+        print(e)
     mes = await bot.send_message(
         chat_id=user.user_id, text=f"{answer}", reply_markup=await ik.is_get_answer()
     )
