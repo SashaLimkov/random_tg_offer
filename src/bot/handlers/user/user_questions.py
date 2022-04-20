@@ -62,7 +62,7 @@ async def is_right_question(message: types.Message, state: FSMContext):
         await bot.send_photo(
             chat_id=user_id,
             photo=message.photo[-1].file_id,
-            caption=td.IS_IT_YOUR_QUESTION.format(question),
+            caption=td.IS_IT_YOUR_QUESTION.format(question.split("|")[0]),
             reply_markup=await ik.is_question_right()
         )
     elif message.document:
@@ -70,14 +70,14 @@ async def is_right_question(message: types.Message, state: FSMContext):
         await bot.send_document(
             chat_id=user_id,
             document=message.document.file_id,
-            caption=td.IS_IT_YOUR_QUESTION.format(question),
+            caption=td.IS_IT_YOUR_QUESTION.format(question.split("|")[0]),
             reply_markup=await ik.is_question_right()
         )
     elif message.text:
         question = message.text + f"|."
         # await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
         await bot.send_message(
-            text=td.IS_IT_YOUR_QUESTION.format(question),
+            text=td.IS_IT_YOUR_QUESTION.format(question.split("|")[0]),
             chat_id=message.chat.id,
             reply_markup=await ik.is_question_right(),
         )
@@ -112,12 +112,23 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
     await question_db.add_history(user=user, pk=q.pk, history=history)
     await UserQuestion.waiting_for_new_question.set()
     if user.user_role == "ученик":
-        mes: types.Message = await bot.edit_message_text(
-            chat_id=user_id,
-            text=td.QUESTION_SENDED,
-            message_id=call.message.message_id,
-            reply_markup=await ik.answer_done()
-        )
+        try:
+            mes: types.Message = await bot.edit_message_text(
+                chat_id=user_id,
+                text=td.QUESTION_SENDED,
+                message_id=call.message.message_id,
+                reply_markup=await ik.answer_done()
+            )
+        except Exception:
+            await bot.delete_message(
+                chat_id=user_id,
+                message_id=call.message.message_id
+            )
+            mes: types.Message = await bot.send_message(
+                chat_id=user_id,
+                text=td.QUESTION_SENDED,
+                reply_markup=await ik.answer_done()
+            )
         user_mes[user_id] = mes.message_id
         sent_q_id_dict = {}
         for kur in k_list:
