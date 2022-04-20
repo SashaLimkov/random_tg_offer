@@ -150,7 +150,7 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                 await bot.send_document(
                     chat_id=m_list[0],
                     document=k_file_id,
-                    text=f"{user.name}: {user_question}",
+                    caption=f"{user.name}: {user_question}",
                     reply_to_message_id=mes_id[m_list[0]],
                 )  # вопрос наставнику
         except Exception as e:
@@ -192,7 +192,7 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                     await bot.send_document(
                         chat_id=m_list[0],
                         document=k_file_id,
-                        text=f"{user.name}: {user_question}",
+                        caption=f"{user.name}: {user_question}",
                         reply_to_message_id=mes_id[m_list[0]],
                     )
         await bot.delete_message(chat_id=user_id, message_id=call.message.message_id)
