@@ -58,7 +58,7 @@ async def is_right_question(message: types.Message, state: FSMContext):
         )
         return
     elif message.photo:
-        question = message.caption + f"|{message.photo[-1].file_id}" if message.caption else f"ВОПРОС С ФОТО|photo{message.photo[-1].file_id}"
+        question = message.caption + f"|photo{message.photo[-1].file_id}" if message.caption else f"ВОПРОС С ФОТО|photo{message.photo[-1].file_id}"
         await bot.send_photo(
             chat_id=user_id,
             photo=message.photo[-1].file_id,
@@ -66,7 +66,7 @@ async def is_right_question(message: types.Message, state: FSMContext):
             reply_markup=await ik.is_question_right()
         )
     elif message.document:
-        question = message.caption + f"|{message.document.file_id}" if message.caption else f"ВОПРОС С ФОТО|document{message.document.file_id}"
+        question = message.caption + f"|document{message.document.file_id}" if message.caption else f"ВОПРОС С ФОТО|document{message.document.file_id}"
         await bot.send_document(
             chat_id=user_id,
             document=message.document.file_id,
