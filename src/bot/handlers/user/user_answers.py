@@ -193,6 +193,10 @@ async def send_new_question(call: types.CallbackQuery, state: FSMContext):
 async def answer_done(call: types.CallbackQuery, state: FSMContext):
     await state.finish()
     user_id = call.from_user.id
+    await bot.delete_message(
+        chat_id=user_id,
+        message_id=call.message.message_id
+    )
     try:
         await bot.edit_message_reply_markup(
             chat_id=user_id, message_id=user_data[user_id], reply_markup=None
