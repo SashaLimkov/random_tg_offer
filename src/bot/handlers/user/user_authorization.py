@@ -38,6 +38,7 @@ async def get_profile_panel(message: types.Message):
 
 async def user_authorization(message: types.Message):
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+    await bot.send_message(chat_id=message.chat.id, text="Приветственный текст")
     await bot.send_message(
         chat_id=message.chat.id,
         text=td.AUTHORIZATION,

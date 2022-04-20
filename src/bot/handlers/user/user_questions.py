@@ -74,7 +74,8 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
     await UserQuestion.waiting_for_new_question.set()
     if user.user_role == "ученик":
         await bot.edit_message_text(
-            chat_id=user_id, text=td.QUESTION_SENDED, message_id=call.message.message_id
+            chat_id=user_id, text=td.QUESTION_SENDED, message_id=call.message.message_id,
+            reply_markup=await ik.answer_done()
         )
         sent_q_id_dict = {}
         for kur in k_list:
@@ -95,7 +96,6 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
             await bot.delete_message(chat_id=m_list[m], message_id=me.message_id)
         mes_id = str(sent_q_id_dict)
         await question_db.add_mes_id(user=user, mes_id=mes_id)
-
 
 # async def continue_question(message: types.Message):
 #     user_id = message.from_user.id

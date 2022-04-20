@@ -2,7 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.data import keyboards_data as kd
 from bot.services.db import question as question_db
 
-__all__ = ["is_question_right", "is_get_answer", "is_new_question_right", "get_q_list","back_to_q_list"]
+__all__ = ["is_question_right", "is_get_answer", "is_new_question_right", "get_q_list", "answer_done"]
 
 from usersupport.models import TelegramUser, UserQuestion
 
@@ -44,6 +44,14 @@ async def is_get_answer():
     return keyboard
 
 
+async def answer_done():
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    keyboard.add(
+        InlineKeyboardButton(text=kd.ANSWER_DONE_TXT, callback_data=kd.ANSWER_DONE_CD),
+    )
+    return keyboard
+
+
 async def get_q_list(user):
     keyboard = InlineKeyboardMarkup(row_width=1)
     questions = await question_db.all_q(user)
@@ -52,9 +60,4 @@ async def get_q_list(user):
         q = question.question
         keyboard.add(InlineKeyboardButton(text=q, callback_data=f"quid_{quid}"))
     keyboard.add(InlineKeyboardButton(text="Назад", callback_data="back"))
-    return keyboard
-
-async def back_to_q_list():
-    keyboard = InlineKeyboardMarkup(row_width=1)
-    keyboard.add(InlineKeyboardButton(text="Назад", callback_data=kd.QUESTIONS_LIST_CD))
     return keyboard
