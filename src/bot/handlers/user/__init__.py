@@ -67,7 +67,9 @@ def setup(dp: Dispatcher):
         state=UserQuestion.waiting_for_user_question,
     )
     dp.register_message_handler(
-        user_questions.is_right_question, state=UserQuestion.waiting_for_user_question
+        user_questions.is_right_question,
+        content_types=[types.ContentTypes.TEXT, types.ContentTypes.PHOTO, types.ContentTypes.DOCUMENT],
+        state=UserQuestion.waiting_for_user_question
     )
     # dp.register_message_handler(user_questions.continue_question, state=UserQuestion.waiting_for_new_question)
     dp.register_message_handler(
