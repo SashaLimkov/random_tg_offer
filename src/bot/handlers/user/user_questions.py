@@ -19,10 +19,14 @@ from usersupport.models import TelegramUser
 
 
 async def create_user_question(call: types.CallbackQuery):
-    await bot.edit_message_text(
-        text=td.ASK_A_QUESTION,
+    await bot.edit_message_reply_markup(
         chat_id=call.from_user.id,
         message_id=call.message.message_id,
+        reply_markup=None
+    )
+    await bot.send_message(
+        text=td.ASK_A_QUESTION,
+        chat_id=call.from_user.id,
     )
     await UserQuestion.waiting_for_user_question.set()
 

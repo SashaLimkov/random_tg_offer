@@ -54,8 +54,8 @@ async def get_answer(message: types.Message):
                 continue
             await bot.send_message(
                 chat_id=k_list[kur],
-                text=f"Куратор {helper.name}: {helper.phone} взялся за вопрос",
-                reply_to_message_id=mes_id[k_list[kur]],
+                text=f"Куратор {helper.name}: {helper.phone}",
+                reply_to_message_id=m[k_list[kur]],
             )
         for m_chat_id in m_list:
             if m_chat_id in m:
