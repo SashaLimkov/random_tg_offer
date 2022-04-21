@@ -54,7 +54,7 @@ async def get_answer(message: types.Message):
                 continue
             await bot.send_message(
                 chat_id=k_list[kur],
-                text=f"Куратор {helper.name}: {helper.phone}",
+                text=f"Куратор {helper.name}: {helper.phone} взялся за вопрос ",
                 reply_to_message_id=m[k_list[kur]],
             )
         for m_chat_id in m_list:
@@ -80,7 +80,6 @@ async def get_answer(message: types.Message):
             )
             del user_mes[user_id]
         except Exception as e:
-            print("222222222222222222222222222222222222222222222")
             print(e)
         mes = await bot.send_message(
             chat_id=user.user_id,
@@ -139,7 +138,6 @@ async def get_answer(message: types.Message):
         )
         del user_mes[user_id]
     except Exception as e:
-        print("11111111111111111111111111111111111111111111111111")
         print(e)
     await question_db.add_history(
         user=user, pk=question.pk, history=history

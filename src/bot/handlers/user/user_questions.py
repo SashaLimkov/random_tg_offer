@@ -117,8 +117,6 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
         k_list = {k.user_id: k.chat_id for k in kurators}
         m_list = [m.chat_id for m in mentors]
         try:
-            print(file_id)
-            print(helper_id, mes_id)
             if file_id.startswith("."):
                 await bot.send_message(
                     chat_id=k_list[helper_id],
@@ -160,16 +158,13 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                 )  # вопрос наставнику
         except Exception as e:
             print(e)
-
             for kur in k_list:
                 if file_id.startswith("."):
-                    print('111')
                     await bot.send_message(
                         chat_id=k_list[kur],
                         text=f"{user.name}: {user_question}",
                         reply_to_message_id=mes_id[k_list[kur]],
                     )
-                    print('222')
                     await bot.send_message(
                         chat_id=m_list[0],
                         text=f"{user.name}: {user_question}",
