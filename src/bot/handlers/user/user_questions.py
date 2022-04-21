@@ -158,6 +158,7 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                 )  # вопрос наставнику
         except Exception as e:
             print(e)
+            print('123')
             for kur in k_list:
                 if file_id.startswith("."):
                     await bot.send_message(
@@ -165,11 +166,13 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                         text=f"{user.name}: {user_question}",
                         reply_to_message_id=mes_id[k_list[kur]],
                     )
-                    await bot.send_message(
-                        chat_id=m_list[0],
-                        text=f"{user.name}: {user_question}",
-                        reply_to_message_id=mes_id[m_list[0]],
-                    )  # вопрос наставнику
+                    if list(k_list.keys()).index(kur) == 0:
+                        await bot.send_message(
+                            chat_id=m_list[0],
+                            text=f"{user.name}: {user_question}",
+                            reply_to_message_id=mes_id[m_list[0]],
+                        )  # вопрос наставнику
+                        print('666')
                 elif file_id.startswith("photo"):
                     k_file_id = file_id.replace("photo", "")
                     await bot.send_photo(
@@ -178,12 +181,13 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                         caption=f"{user.name}: {user_question}",
                         reply_to_message_id=mes_id[k_list[kur]],
                     )
-                    await bot.send_photo(
-                        chat_id=m_list[0],
-                        photo=k_file_id,
-                        caption=f"{user.name}: {user_question}",
-                        reply_to_message_id=mes_id[m_list[0]],
-                    )  # вопрос наставник
+                    if list(k_list.keys()).index(kur) == 0:
+                        await bot.send_photo(
+                            chat_id=m_list[0],
+                            photo=k_file_id,
+                            caption=f"{user.name}: {user_question}",
+                            reply_to_message_id=mes_id[m_list[0]],
+                        )  # вопрос наставник
                 elif file_id.startswith("document"):
                     k_file_id = file_id.replace("document", "")
                     await bot.send_document(
@@ -192,13 +196,17 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                         caption=f"{user.name}: {user_question}",
                         reply_to_message_id=mes_id[k_list[kur]],
                     )
-                    await bot.send_document(
-                        chat_id=m_list[0],
-                        document=k_file_id,
-                        caption=f"{user.name}: {user_question}",
-                        reply_to_message_id=mes_id[m_list[0]],
-                    )
-        await bot.delete_message(chat_id=user_id, message_id=call.message.message_id)
+                    if list(k_list.keys()).index(kur) == 0:
+                        await bot.send_document(
+                            chat_id=m_list[0],
+                            document=k_file_id,
+                            caption=f"{user.name}: {user_question}",
+                            reply_to_message_id=mes_id[m_list[0]],
+                        )
+        try:
+            await bot.delete_message(chat_id=user_id, message_id=call.message.message_id)
+        except:
+            pass
         try:
             await bot.delete_message(
                 chat_id=user_id,
