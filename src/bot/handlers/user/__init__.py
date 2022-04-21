@@ -55,6 +55,7 @@ def setup(dp: Dispatcher):
     dp.register_callback_query_handler(
         user_questions.create_user_question,
         lambda call: call.data == kd.ASK_A_QUESTION_CD,
+        state="*"
     )
     dp.register_callback_query_handler(
         user_questions.wrong_q,
@@ -67,29 +68,13 @@ def setup(dp: Dispatcher):
         state=UserQuestion.waiting_for_user_question,
     )
     dp.register_message_handler(
-        user_questions.is_right_question, state=UserQuestion.waiting_for_user_question
+        user_questions.is_right_question,
+        content_types=types.ContentTypes.ANY,
+        state=UserQuestion.waiting_for_user_question
     )
     # dp.register_message_handler(user_questions.continue_question, state=UserQuestion.waiting_for_new_question)
     dp.register_message_handler(
         user_answers.get_answer, lambda message: message.reply_to_message
-    )
-    dp.register_callback_query_handler(
-        user_answers.new_question,
-        lambda call: call.data == kd.APPEND_QUESTION_CD,
-        state="*",
-    )
-    dp.register_message_handler(
-        user_answers.is_right_new_question, state=UserQuestion.waiting_for_new_question
-    )
-    dp.register_callback_query_handler(
-        user_answers.wrong_question,
-        lambda call: call.data == kd.NEW_WRONG_QUESTION_CD,
-        state=UserQuestion.waiting_for_new_question,
-    )
-    dp.register_callback_query_handler(
-        user_answers.send_new_question,
-        lambda call: call.data == kd.NEW_RIGHT_QUESTION_CD,
-        state=UserQuestion.waiting_for_new_question,
     )
     dp.register_callback_query_handler(
         user_answers.answer_done, lambda call: call.data == kd.ANSWER_DONE_CD, state="*"

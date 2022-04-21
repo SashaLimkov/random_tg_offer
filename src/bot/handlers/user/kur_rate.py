@@ -44,11 +44,19 @@ async def set_rate(call: types.CallbackQuery):
         m_list = [m.chat_id for m in mentors]
         text = f"Пользователь закрыл вопрос.\nОценка пользователя:{'🌟' * int(question.rate)}\nОтзыв: {question.feedback}"
         await question_db.update_state(user=user, pk=question.pk)
-        await bot.send_message(
-            chat_id=k_list[helper_id],
-            text="Пользователь закрыл вопрос",
-            reply_to_message_id=mes_id[k_list[helper_id]]
-        )  # вопрос к куратору
+        try:
+            await bot.send_message(
+                chat_id=k_list[helper_id],
+                text="Пользователь закрыл вопрос",
+                reply_to_message_id=mes_id[k_list[helper_id]]
+            )  # вопрос к куратору
+        except:
+            for kur in k_list:
+                await bot.send_message(
+                    chat_id=k_list[kur],
+                    text="Пользователь закрыл вопрос",
+                    reply_to_message_id=mes_id[k_list[kur]]
+                )  # вопрос к куратору
         await bot.send_message(
             chat_id=m_list[0], text=text, reply_to_message_id=mes_id[m_list[0]]
         )  # вопрос наставнику
