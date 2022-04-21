@@ -97,7 +97,6 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
     user_id = call.from_user.id
     user: TelegramUser = await user_db.select_user(user_id=user_id)
     kurators, mentors = await user_db.select_all_kurators_and_mentors()
-    all_kurators_list = [k.chat_id for k in kurators]
     k_list = {k.chanel_id: k.chat_id for k in kurators if k.state == 1}
     m_list = {m.chanel_id: m.chat_id for m in mentors if m.state == 1}
     text = "{}\nВопрос от пользователя {}: {}\n{}"
@@ -109,7 +108,11 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
         question = f"Q: {user_question}\n"
         history = f"{q.history}{question}\n"
         await question_db.add_history(user=user, pk=q.pk, history=history)
+        kurators, mentors = await user_db.select_all_kurators_and_mentors()
+        k_list = {k.user_id: k.chat_id for k in kurators}
+        m_list = [m.chat_id for m in mentors]
         try:
+            print('11111111111')
             if file_id.startswith("."):
                 await bot.send_message(
                     chat_id=k_list[helper_id],
@@ -150,7 +153,10 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                     reply_to_message_id=mes_id[m_list[0]],
                 )  # вопрос наставнику
         except:
+            print('2222222222')
+            print(k_list)
             for kur in k_list:
+                print(file_id)
                 if file_id.startswith("."):
                     await bot.send_message(
                         chat_id=k_list[kur],
@@ -203,7 +209,8 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
         user_mes[user_id] = mes.message_id
         return
     #________________________________________________________________________________________________________________
-    except Exception:
+    except Exception as e:
+        print(e)
         await question_db.add_question(user=user, question=user_question)
     q: ModelUserQuestion = await question_db.select_question(user=user)
     await question_db.add_history(user=user, pk=q.pk, history=history)
