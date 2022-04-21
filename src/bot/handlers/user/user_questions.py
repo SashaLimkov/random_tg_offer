@@ -281,7 +281,7 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
             sent_q_id_dict[m_list[m]] = me.message_id + 1
             await bot.delete_message(chat_id=m_list[m], message_id=me.message_id)
         mes_id = str(sent_q_id_dict)
-        await question_db.add_mes_id(user=user, mes_id=mes_id)
+        await question_db.add_mes_id(user=user, pk=q.pk, mes_id=mes_id)
 
 # async def continue_question(message: types.Message):
 #     user_id = message.from_user.id
