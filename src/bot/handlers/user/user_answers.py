@@ -29,9 +29,13 @@ async def get_answer(message: types.Message):
     helper: TelegramUser = await user_db.select_user(
         user_id=helper_id
     )  # куратор ответивший
-    question: UserQuestion = await question_db.select_question(user=user)  # вопрос
-    if helper.state == 1 and helper.user_role == "куратор":
+    question: UserQuestion = await question_db.select_question(user=user) # вопрос
+    now_helper = question.helper_id
+
+    if helper and helper.state == 1 and helper.user_role == "куратор":
         if not question:
+            return
+        if helper_id != now_helper and now_helper:
             return
         await user_db.update_user_state(
             user_id=helper_id, state=0
@@ -81,6 +85,7 @@ async def get_answer(message: types.Message):
         )  # отправили наставнику ответ куратора
         return
     answer = message.text
+
     history = f"{question.history}A: {answer}\n"
 
     kurators, mentors = await user_db.select_all_kurators_and_mentors()
@@ -88,10 +93,10 @@ async def get_answer(message: types.Message):
     k_all = [k.chat_id for k in kurators]
     m_list = [m.chat_id for m in mentors]
     mes_id = eval(question.mes_id)
-    await question_db.add_history(
-        user=user, pk=question.pk, history=history
-    )  # записали историю в бд
+
     if helper.user_role == "куратор":
+        if helper_id != now_helper and now_helper:
+            return
         await bot.send_message(
             chat_id=m_list[0],
             text=f"{helper.name}: {answer}",
@@ -126,6 +131,9 @@ async def get_answer(message: types.Message):
     except Exception as e:
         print("11111111111111111111111111111111111111111111111111")
         print(e)
+    await question_db.add_history(
+        user=user, pk=question.pk, history=history
+    )  # записали историю в бд
     mes = await bot.send_message(
         chat_id=user.user_id, text=f"{answer}", reply_markup=await ik.is_get_answer()
     )

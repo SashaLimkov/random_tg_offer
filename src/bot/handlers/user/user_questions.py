@@ -50,6 +50,7 @@ async def wrong_q(call: types.CallbackQuery, state: FSMContext):
 
 
 async def is_right_question(message: types.Message, state: FSMContext):
+    #Убрать кнопку завершить
     user_id = message.chat.id
     if message.media_group_id:
         await bot.send_message(
@@ -155,13 +156,16 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
                 )  # вопрос наставнику
         except Exception as e:
             print(e)
+
             for kur in k_list:
                 if file_id.startswith("."):
+                    print('111')
                     await bot.send_message(
                         chat_id=k_list[kur],
                         text=f"{user.name}: {user_question}",
                         reply_to_message_id=mes_id[k_list[kur]],
                     )
+                    print('222')
                     await bot.send_message(
                         chat_id=m_list[0],
                         text=f"{user.name}: {user_question}",
@@ -206,7 +210,9 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
             pass
         mes = await bot.send_message(chat_id=user_id, text=td.QUESTION_SENDED, reply_markup=await ik.answer_done())
         user_mes[user_id] = mes.message_id
+        await UserQuestion.waiting_for_user_question.set()
         return
+
     # ________________________________________________________________________________________________________________
     except Exception as e:
         print(e)
