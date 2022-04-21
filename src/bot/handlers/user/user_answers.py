@@ -45,9 +45,18 @@ async def get_answer(message: types.Message):
             user=user, pk=question.pk, helper_id=helper_id
         )  # Добавили вопросу id отвечающего на него
         kurators, mentors = await user_db.select_all_kurators_and_mentors()
+        k_list = {k.user_id: k.chat_id for k in kurators}
         m_list = [m.chat_id for m in mentors]
         m = eval(question.mes_id)
         mes_id = {message.chat.id: message.reply_to_message.message_id}
+        for kur in k_list:
+            if kur == helper_id:
+                continue
+            await bot.send_message(
+                chat_id=k_list[kur],
+                text=f"Куратор {helper.name}: {helper.phone} взялся за вопрос",
+                reply_to_message_id=mes_id[k_list[kur]],
+            )
         for m_chat_id in m_list:
             if m_chat_id in m:
                 mes_id.update({m_chat_id: m[m_chat_id]})
@@ -60,6 +69,7 @@ async def get_answer(message: types.Message):
             text=f"Куратор {helper.name}: {helper.phone}\n",
             reply_to_message_id=mes_id[m_list[0]],
         )  # Отправили в чат наставника инфу о том, кто взялся за вопрос
+
         answer = message.text
         history = f"{question.history}A: {answer}\n"
         await question_db.add_history(user=user, pk=question.pk, history=history)
