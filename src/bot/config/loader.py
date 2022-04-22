@@ -8,3 +8,4 @@ storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 user_data = {}
 user_mes = {}
+mes_to_del = {}

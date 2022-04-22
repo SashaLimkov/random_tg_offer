@@ -2,8 +2,9 @@ import requests
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from bot.config.loader import bot
+from bot.config.loader import bot, mes_to_del
 from bot.data import text_data as td
+from bot.handlers.user.cleaner import del_mes_history
 from bot.keyboards import inline as ik
 from bot.services.db import user as user_db
 from bot.states import UserAuth
@@ -38,12 +39,17 @@ async def get_profile_panel(message: types.Message):
 
 async def user_authorization(message: types.Message):
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-    await bot.send_message(chat_id=message.chat.id, text="Приветственный текст")
-    await bot.send_message(
+    hi = await bot.send_message(chat_id=message.chat.id, text="Приветственный текст")
+    mes = await bot.send_message(
         chat_id=message.chat.id,
         text=td.AUTHORIZATION,
         reply_markup=await ik.user_auth(),
     )
+    if message.chat.id in mes_to_del:
+        mes_to_del[message.chat.id].append(mes.message_id)
+        mes_to_del[message.chat.id].append(hi.message_id)
+    else:
+        mes_to_del[message.chat.id] = [mes.message_id]
 
 
 async def get_user_phone_number(call: types.CallbackQuery):
@@ -58,6 +64,7 @@ async def get_user_phone_number(call: types.CallbackQuery):
 async def check_phone(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     phone_number = message.text
+    mes_to_del[message.chat.id].append(message.message_id)
     if await is_phone_number_valid(phone_number):
         await state.finish()
         r = requests.get(
@@ -71,12 +78,14 @@ async def check_phone(message: types.Message, state: FSMContext):
                     await user_db.update_user_phone(user_id=user_id, phone=phone_number)
                 except:
                     await bot.delete_message(message.chat.id, message.message_id)
-                    await bot.send_message(
+                    mes = await bot.send_message(
                         message.chat.id, "Пользователь с таким номером уже аторизован"
                     )
+                    mes_to_del[message.chat.id].append(mes.message_id)
                     return
                 await bot.delete_message(chat_id=user_id, message_id=message.message_id)
                 if user.user_role == "ученик":
+                    await del_mes_history(message.chat.id)
                     await bot.send_message(
                         chat_id=user_id,
                         text=td.SUCCESS_LOGIN_USR.format(user.name),
@@ -115,27 +124,32 @@ async def check_phone(message: types.Message, state: FSMContext):
             await _role_segregated_menu(message, result, user)
         else:
             await bot.delete_message(message.chat.id, message.message_id)
-            await bot.send_message(
+            mes = await bot.send_message(
                 message.chat.id, "Пользователь с таким номером уже аторизован"
             )
+            mes_to_del[message.chat.id].append(mes.message_id)
 
     else:
-        await bot.send_message(chat_id=user_id, text=td.INVALID_PHONE)
+        mes = await bot.send_message(chat_id=user_id, text=td.INVALID_PHONE)
+        mes_to_del[message.chat.id].append(mes.message_id)
 
 
 async def _role_segregated_menu(message: types.Message, result, user: TelegramUser):
     user_id = message.from_user.id
     if result["user"] and not result["is_active"]:
-        await bot.send_message(
+        mes = await bot.send_message(
             chat_id=user_id, text=td.UNAVALIABLE_AUTH, reply_markup=await ik.user_auth()
         )
+        mes_to_del[message.chat.id].append(mes.message_id)
     if result["user"] and result["is_active"]:
         if user.user_role == "ученик":
-            await bot.send_message(
+            mes = await bot.send_message(
                 chat_id=user_id,
                 text=td.SUCCESS_LOGIN_USR.format(user.name),
                 reply_markup=await ik.user_questions(),
             )
+            await del_mes_history(message.chat.id)
+            mes_to_del[message.chat.id].append(mes.message_id)
         if user.user_role == "куратор":
             await bot.send_message(
                 chat_id=user_id,
