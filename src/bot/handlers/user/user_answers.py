@@ -85,7 +85,6 @@ async def get_answer(message: types.Message):
             print(user_mes)
             del user_mes[user_id]
         except Exception as e:
-            print("222222222222222222222222222222222222222222222")
             print(e)
         mes = await bot.send_message(
             chat_id=user.user_id,
