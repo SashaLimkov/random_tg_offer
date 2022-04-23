@@ -73,6 +73,6 @@ async def get_q_list(user):
 async def back_to_q_list():
     keyboard = InlineKeyboardMarkup(row_width=1)
     keyboard.add(InlineKeyboardButton(
-        text=kd.QUESTIONS_LIST_TXT, callback_data=kd.QUESTIONS_LIST_CD
+        text="Назад", callback_data=kd.QUESTIONS_LIST_CD
     ))
     return keyboard

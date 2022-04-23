@@ -3,7 +3,8 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 
 import bot.config.config
-from bot.config.loader import bot
+from bot.config.loader import bot, mes_to_del
+from bot.handlers.user.cleaner import del_mes_history
 from bot.keyboards import reply as rk
 from bot.keyboards import inline as ik
 from bot.data import text_data as td
@@ -27,11 +28,12 @@ async def set_rate(call: types.CallbackQuery):
     )
     if int(rate) <= 3:
         await Rate.waiting_for_rate.set()
-        await bot.send_message(
+        mes = await bot.send_message(
             chat_id=call.from_user.id,
             text="Пожалуйста, напишите что вас не устроило",
             reply_markup=rk.no_comment_keyboard,
         )
+        mes_to_del[call.message.chat.id].append(mes.message_id)
     else:
         await question_db.update_feedback(
             user=user, pk=question.pk, feedback="Пользователь не оставил отзыв"
@@ -69,6 +71,7 @@ async def set_rate(call: types.CallbackQuery):
             reply_markup=ReplyKeyboardRemove(),
         )
         await bot.delete_message(user_id, mes.message_id)
+        await del_mes_history(call.message.chat.id)
         await bot.send_message(
             chat_id=user_id,
             text=td.SUCCESS_LOGIN_USR.format(user.name),
@@ -120,6 +123,7 @@ async def get_rate(message: types.Message, state: FSMContext):
     )
     await bot.delete_message(user_id, mes.message_id)
     await bot.delete_message(user_id, message.message_id)
+    await del_mes_history(message.chat.id)
     await bot.send_message(
         chat_id=user_id,
         text=td.SUCCESS_LOGIN_USR.format(user.name),
