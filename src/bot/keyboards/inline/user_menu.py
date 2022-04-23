@@ -38,7 +38,7 @@ async def main_kurator_menu():
     keyboard = InlineKeyboardMarkup(row_width=1)
     keyboard.add(
         InlineKeyboardButton(
-            text=kd.QUESTIONS_LIST_TXT, callback_data=kd.QUESTIONS_LIST_CD
+            text=kd.QUESTIONS_LIST_TXT, callback_data="asdasd"
         ),
         InlineKeyboardButton(
             text=kd.KUR_ACTIVITY_TXT, callback_data=kd.KUR_ACTIVITY_CD
@@ -51,7 +51,7 @@ async def main_nastavnik_menu():
     keyboard = InlineKeyboardMarkup(row_width=2)
     keyboard.add(
         InlineKeyboardButton(
-            text=kd.QUESTIONS_LIST_TXT, callback_data=kd.QUESTIONS_LIST_CD
+            text=kd.QUESTIONS_LIST_TXT, callback_data="asdasd"
         ),
     )
     return keyboard

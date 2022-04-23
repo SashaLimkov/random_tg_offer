@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from bot.config.loader import bot, user_mes
+from bot.config.loader import bot, user_mes, mes_to_del
 from bot.data import text_data as td
 from bot.keyboards import inline as ik
 from bot.services.db import question as question_db
@@ -24,31 +24,40 @@ async def create_user_question(call: types.CallbackQuery):
         message_id=call.message.message_id,
         reply_markup=None
     )
-    await bot.send_message(
+    mes = await bot.send_message(
         text=td.ASK_A_QUESTION,
         chat_id=call.from_user.id,
     )
+    print(mes.message_id)
+    mes_to_del[call.message.chat.id].append(mes.message_id)
     await UserQuestion.waiting_for_user_question.set()
 
 
 async def wrong_q(call: types.CallbackQuery, state: FSMContext):
     user_id = call.from_user.id
     mes_id = call.message.message_id
+    print(mes_id)
     try:
-        await bot.edit_message_text(
+        print(123)
+        mes = await bot.edit_message_text(
             text=td.ASK_A_QUESTION,
             chat_id=user_id,
             message_id=mes_id,
         )
-    except Exception:
+        print(234)
+        mes_to_del[call.message.chat.id].append(mes.message_id)
+    except Exception as e:
+        print(e)
         await bot.delete_message(
             chat_id=user_id,
             message_id=mes_id
         )
-        await bot.send_message(
+        mes = await bot.send_message(
             text=td.ASK_A_QUESTION,
             chat_id=user_id,
         )
+        mes_to_del[call.message.chat.id].append(mes.message_id)
+
     await state.finish()
     await UserQuestion.waiting_for_user_question.set()
 
@@ -57,10 +66,11 @@ async def is_right_question(message: types.Message, state: FSMContext):
     #Убрать кнопку завершить
     user_id = message.chat.id
     if message.media_group_id:
-        await bot.send_message(
+        mes = await bot.send_message(
             chat_id=user_id,
             text='Вы можете отправить только текст с фотографией , либо по отдельности'
         )
+        mes_to_del[message.chat.id].append(mes.message_id)
         return
     elif message.photo:
         question = message.caption + f"|photo{message.photo[-1].file_id}" if message.caption else f"ВОПРОС С ФОТО|photo{message.photo[-1].file_id}"
@@ -87,10 +97,11 @@ async def is_right_question(message: types.Message, state: FSMContext):
             reply_markup=await ik.is_question_right(),
         )
     else:
-        await bot.send_message(
+        mes = await bot.send_message(
             chat_id=user_id,
             text='Вы можете отправить только текст с фотографией , либо по отдельности'
         )
+        mes_to_del[message.chat.id].append(mes.message_id)
         return
     await state.update_data(user_question=question)
 
@@ -216,6 +227,7 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
         except:
             pass
         mes = await bot.send_message(chat_id=user_id, text=td.QUESTION_SENDED, reply_markup=await ik.answer_done())
+        mes_to_del[call.message.chat.id].append(mes.message_id)
         user_mes[user_id] = mes.message_id
         await UserQuestion.waiting_for_user_question.set()
         return

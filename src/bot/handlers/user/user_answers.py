@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from bot.config import config
-from bot.config.loader import bot, user_data, user_mes
+from bot.config.loader import bot, user_data, user_mes, mes_to_del
 from bot.data import text_data as td
 from bot.keyboards import reply as rk
 from bot.keyboards import inline as ik
@@ -29,17 +29,16 @@ async def get_answer(message: types.Message):
     helper: TelegramUser = await user_db.select_user(
         user_id=helper_id
     )  # куратор ответивший
-    question: UserQuestion = await question_db.select_question(user=user) # вопрос
+    question: UserQuestion = await question_db.select_question(user=user)  # вопрос
     now_helper = question.helper_id
-
     if helper and helper.state == 1 and helper.user_role == "куратор":
         if not question:
             return
         if helper_id != now_helper and now_helper:
             return
-        await user_db.update_user_state(
-            user_id=helper_id, state=0
-        )  # поставили состояние у куратора "отвечает на вопрос"
+        # await user_db.update_user_state(
+        #     user_id=helper_id, state=0
+        # )  # поставили состояние у куратора "отвечает на вопрос"
 
         await question_db.add_helper(
             user=user, pk=question.pk, helper_id=helper_id
@@ -49,14 +48,19 @@ async def get_answer(message: types.Message):
         m_list = [m.chat_id for m in mentors]
         m = eval(question.mes_id)
         mes_id = {message.chat.id: message.reply_to_message.message_id}
+        # print(m)
         for kur in k_list:
-            if kur == helper_id:
-                continue
-            await bot.send_message(
-                chat_id=k_list[kur],
-                text=f"Куратор {helper.name}: {helper.phone} взялся за вопрос ",
-                reply_to_message_id=m[k_list[kur]],
-            )
+            # print(kur)
+            try:
+                if kur == helper_id:
+                    continue
+                await bot.send_message(
+                    chat_id=k_list[kur],
+                    text=f"Куратор {helper.name}: {helper.phone} взялся за вопрос",
+                    reply_to_message_id=m[k_list[kur]],
+                )
+            except:
+                pass
         for m_chat_id in m_list:
             if m_chat_id in m:
                 mes_id.update({m_chat_id: m[m_chat_id]})
@@ -78,14 +82,23 @@ async def get_answer(message: types.Message):
                 chat_id=user_id,
                 message_id=user_mes[user_id]
             )
+            # print(user_mes)
             del user_mes[user_id]
         except Exception as e:
-            print(e)
+            # print(e)
+            pass
         mes = await bot.send_message(
             chat_id=user.user_id,
             text=f"{answer}",  # тут можно написать ОТВЕТ ОТ КУРАТОРА перед ответом для юзера
             reply_markup=await ik.is_get_answer(),
         )
+        try:
+            await bot.edit_message_reply_markup(
+                chat_id=user.user_id, message_id=user_data[user.user_id], reply_markup=None
+            )
+        except Exception as e:
+            # print(e)
+            pass
         user_data[user.user_id] = mes.message_id
         await bot.send_message(
             chat_id=m_list[0],
@@ -120,17 +133,21 @@ async def get_answer(message: types.Message):
             )  # отправили куратору ответ от наставника
         except KeyError:
             for k_id in k_all:
-                await bot.send_message(
-                    chat_id=k_id,
-                    text=f"Ответ от наставника {helper.name}: {helper.phone}\n{answer}",
-                    reply_to_message_id=mes_id[k_id],
-                )
+                try:
+                    await bot.send_message(
+                        chat_id=k_id,
+                        text=f"Ответ от наставника {helper.name}: {helper.phone}\n{answer}",
+                        reply_to_message_id=mes_id[k_id],
+                    )
+                except:
+                    pass
     try:
         await bot.edit_message_reply_markup(
             chat_id=user.user_id, message_id=user_data[user.user_id], reply_markup=None
         )
     except Exception as e:
-        print(e)
+        # print(e)
+        pass
     try:
         await bot.delete_message(
             chat_id=user_id,
@@ -138,27 +155,36 @@ async def get_answer(message: types.Message):
         )
         del user_mes[user_id]
     except Exception as e:
-        print(e)
+        # print(e)
+        pass
     await question_db.add_history(
         user=user, pk=question.pk, history=history
     )  # записали историю в бд
+
+    await bot.edit_message_reply_markup(
+            chat_id=user_id, message_id=user_mes[user_id], reply_markup=None
+        )
     mes = await bot.send_message(
         chat_id=user.user_id, text=f"{answer}", reply_markup=await ik.is_get_answer()
     )
+    user_mes[user.user_id] = mes.message_id
     user_data[user.user_id] = mes.message_id
+    print(
+        user_mes,user_data,sep="\n"
+    )
     # await StateUserQuestion.wait_for_new_q_or_done.set(u)
 
 
 async def answer_done(call: types.CallbackQuery, state: FSMContext):
     await state.finish()
     user_id = call.from_user.id
-    await bot.delete_message(
-        chat_id=user_id,
-        message_id=call.message.message_id
-    )
+    # await bot.delete_message(
+    #     chat_id=user_id,
+    #     message_id=call.message.message_id
+    # )
     try:
         await bot.edit_message_reply_markup(
-            chat_id=user_id, message_id=user_data[user_id], reply_markup=None
+            chat_id=user_id, message_id=call.message.message_id, reply_markup=None
         )
     except Exception as e:
         print(e)
@@ -167,11 +193,12 @@ async def answer_done(call: types.CallbackQuery, state: FSMContext):
     question: UserQuestion = await question_db.select_question(user=user)
     helper_id = question.helper_id
     await user_db.update_user_state(user_id=helper_id, state=1)
-    await bot.send_message(
+    mes = await bot.send_message(
         chat_id=user_id,
         text="Поставьте оценку",
         reply_markup=await ik.set_kurators_rate(),
     )
+    mes_to_del[call.message.chat.id].append(mes.message_id)
 
 # kur_mess_id = ...  # cur.execute('SELECT kurmes FROM data WHERE id == ?', (message.from_user.id,)).fetchone()[
 # # 0]
