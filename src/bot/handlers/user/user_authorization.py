@@ -39,7 +39,7 @@ async def get_profile_panel(message: types.Message):
 
 async def user_authorization(message: types.Message):
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-    hi = await bot.send_message(chat_id=message.chat.id, text="Приветственный текст")
+    hi = await bot.send_message(chat_id=message.chat.id, text="Приветствую , я чат-бот NSA\n\nЗдесь вы можете задать вопрос куратору✏️\n\nПожалуйста, задавайте вопрос подробно и конкретно, чтобы специалист смог ответить на него точно.\n\nПосле того, как вы напишете вопрос, на него ответит первый освободившийся куратор. Просим вас ожидать�\\n\nТак же вы можете посмотреть историю вопросов и диалогов с куратором\n\nЧто бы задать вопрос, необходимо авторизоваться по номер телефону в формате 89000000000")
     mes = await bot.send_message(
         chat_id=message.chat.id,
         text=td.AUTHORIZATION,
