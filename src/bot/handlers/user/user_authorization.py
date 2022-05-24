@@ -67,10 +67,9 @@ async def check_phone(message: types.Message, state: FSMContext):
     mes_to_del[message.chat.id].append(message.message_id)
     if await is_phone_number_valid(phone_number):
         await state.finish()
-        r = requests.get(
-            "https://api.nutritionscience.pro/api/v1/users/tgbot?phone=89867178660"
+        r = requests.get(f"https://api.nutritionscience.pro/api/v1/users/tgbot?phone={phone_number}")
             # params={"phone": "89867178660"},
-        )  # params={'phone': "phone_number"}
+        # )  #
         try:
             user: TelegramUser = await user_db.select_user(user_id)
             if user:

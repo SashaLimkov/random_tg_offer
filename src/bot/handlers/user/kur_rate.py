@@ -26,11 +26,19 @@ async def set_rate(call: types.CallbackQuery):
     await bot.edit_message_reply_markup(
         chat_id=user_id, message_id=call.message.message_id
     )
-    if int(rate) <= 3:
+    if int(rate) <=2:
         await Rate.waiting_for_rate.set()
         mes = await bot.send_message(
             chat_id=call.from_user.id,
-            text="Пожалуйста, напишите что вас не устроило",
+            text='Нам жаль, что Вам не понравилось общение в чат-боте, подскажите, что  именно Вам не понравилось? Будем благодарны за обратную связь',
+            reply_markup=rk.no_comment_keyboard,
+        )
+        mes_to_del[call.message.chat.id].append(mes.message_id)
+    elif int(rate) == 3:
+        await Rate.waiting_for_rate.set()
+        mes = await bot.send_message(
+            chat_id=call.from_user.id,
+            text="Благодарим за вашу оценку, подскажите, что мы можем улучшить для комфортного взаимодействия с Вами?",
             reply_markup=rk.no_comment_keyboard,
         )
         mes_to_del[call.message.chat.id].append(mes.message_id)
@@ -65,18 +73,47 @@ async def set_rate(call: types.CallbackQuery):
         await bot.send_message(
             chat_id=m_list[0], text=text, reply_to_message_id=mes_id[m_list[0]]
         )  # вопрос наставнику
-        mes = await bot.send_message(
-            chat_id=user_id,
-            text=td.SUCCESS_LOGIN_USR.format(user.name),
-            reply_markup=ReplyKeyboardRemove(),
-        )
-        await bot.delete_message(user_id, mes.message_id)
-        await del_mes_history(call.message.chat.id)
-        await bot.send_message(
-            chat_id=user_id,
-            text=td.SUCCESS_LOGIN_USR.format(user.name),
-            reply_markup=await ik.user_questions(),
-        )
+
+        if int(question.rate) == 5 or int(question.rate) == 4:
+            mes = await bot.send_message(
+                chat_id=user_id,
+                text=td.RATE45.format(user.name),
+                reply_markup=ReplyKeyboardRemove(),
+            )
+            await bot.delete_message(user_id, mes.message_id)
+            await del_mes_history(call.message.chat.id)
+            await bot.send_message(
+                chat_id=user_id,
+                text=td.RATE45.format(user.name),
+                reply_markup=await ik.user_questions(),
+            )
+        elif int(question.rate) == 3:
+            mes = await bot.send_message(
+                chat_id=user_id,
+                text=td.RATE3.format(user.name),
+                reply_markup=ReplyKeyboardRemove(),
+            )
+            await bot.delete_message(user_id, mes.message_id)
+            await del_mes_history(call.message.chat.id)
+            await bot.send_message(
+                chat_id=user_id,
+                text=td.RATE3.format(user.name),
+                reply_markup=await ik.user_questions(),
+            )
+        elif int(question.rate) == 2 or int(question.rate) == 1:
+            mes = await bot.send_message(
+                chat_id=user_id,
+                text=td.RATE12.format(user.name),
+                reply_markup=ReplyKeyboardRemove(),
+            )
+            await bot.delete_message(user_id, mes.message_id)
+            await del_mes_history(call.message.chat.id)
+            await bot.send_message(
+                chat_id=user_id,
+                text=td.RATE12.format(user.name),
+                reply_markup=await ik.user_questions(),
+            )
+
 
 
 async def get_rate(message: types.Message, state: FSMContext):
@@ -116,16 +153,49 @@ async def get_rate(message: types.Message, state: FSMContext):
         chat_id=m_list[0], text=text, reply_to_message_id=mes_id[m_list[0]]
     )  # вопрос наставнику
     await question_db.update_state(user=user, pk=question.pk)
-    mes = await bot.send_message(
-        chat_id=user_id,
-        text=td.SUCCESS_LOGIN_USR.format(user.name),
-        reply_markup=ReplyKeyboardRemove(),
-    )
-    await bot.delete_message(user_id, mes.message_id)
-    await bot.delete_message(user_id, message.message_id)
-    await del_mes_history(message.chat.id)
-    await bot.send_message(
-        chat_id=user_id,
-        text=td.SUCCESS_LOGIN_USR.format(user.name),
-        reply_markup=await ik.user_questions(),
-    )
+
+    if int(question.rate) == 5 or int(question.rate) == 4:
+        mes = await bot.send_message(
+            chat_id=user_id,
+            text=td.RATE45.format(user.name),
+            reply_markup=ReplyKeyboardRemove(),
+        )
+        await bot.delete_message(user_id, mes.message_id)
+        await bot.delete_message(user_id, message.message_id)
+        await del_mes_history(message.chat.id)
+        await bot.send_message(
+            chat_id=user_id,
+            text=td.RATE45.format(user.name),
+            reply_markup=await ik.user_questions(),
+        )
+
+    elif int(question.rate) == 3:
+        mes = await bot.send_message(
+            chat_id=user_id,
+            text=td.RATE3.format(user.name),
+            reply_markup=ReplyKeyboardRemove(),
+        )
+        await bot.delete_message(user_id, mes.message_id)
+        await bot.delete_message(user_id, message.message_id)
+        await del_mes_history(message.chat.id)
+        await bot.send_message(
+            chat_id=user_id,
+            text=td.RATE3.format(user.name),
+            reply_markup=await ik.user_questions(),
+        )
+
+    elif int(question.rate) == 2 or int(question.rate) == 1:
+        mes = await bot.send_message(
+            chat_id=user_id,
+            text=td.RATE12.format(user.name),
+            reply_markup=ReplyKeyboardRemove(),
+        )
+        await bot.delete_message(user_id, mes.message_id)
+        await bot.delete_message(user_id, message.message_id)
+        await del_mes_history(message.chat.id)
+        await bot.send_message(
+            chat_id=user_id,
+            text=td.RATE12.format(user.name),
+            reply_markup=await ik.user_questions(),
+        )
+

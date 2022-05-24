@@ -10,6 +10,7 @@ class QuestionsAdmin(admin.ModelAdmin):
         "helper_id",
         "question",
         "history",
+        "history2",
         "state",
         "rate",
         "feedback",

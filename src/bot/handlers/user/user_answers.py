@@ -1,3 +1,6 @@
+from datetime import date
+from datetime import datetime
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
@@ -75,8 +78,13 @@ async def get_answer(message: types.Message):
         )  # Отправили в чат наставника инфу о том, кто взялся за вопрос
 
         answer = message.text
+        # time = datetime.datetime.now()
+        dt = datetime.combine(date.today(), datetime.now().time())
+        print(dt.isoformat(timespec='minutes').replace('T', ' '))
         history = f"{question.history}A: {answer}\n"
+        history2 = f"{question.history2}A: {answer}{str(dt.isoformat(timespec='minutes').replace('T', ' '))}\n"
         await question_db.add_history(user=user, pk=question.pk, history=history)
+        await question_db.add_history2(user=user, pk=question.pk, history2=history2)
         try:
             await bot.delete_message(
                 chat_id=user_id,
@@ -107,8 +115,11 @@ async def get_answer(message: types.Message):
         )  # отправили наставнику ответ куратора
         return
     answer = message.text
+    dt = datetime.combine(date.today(), datetime.now().time())
+    print(dt.isoformat(timespec='minutes').replace('T', ' '))
 
     history = f"{question.history}A: {answer}\n"
+    history2 = f"{question.history2}A: {answer}{str(dt.isoformat(timespec='minutes').replace('T', ' '))}\n"
 
     kurators, mentors = await user_db.select_all_kurators_and_mentors()
     k_list = {k.user_id: k.chat_id for k in kurators}
@@ -158,7 +169,9 @@ async def get_answer(message: types.Message):
         # print(e)
         pass
     await question_db.add_history(
-        user=user, pk=question.pk, history=history
+        user=user, pk=question.pk, history=history)
+    await question_db.add_history2(
+        user=user, pk=question.pk, history2=history2
     )  # записали историю в бд
 
     await bot.edit_message_reply_markup(

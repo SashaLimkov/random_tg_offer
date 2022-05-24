@@ -39,6 +39,9 @@ class UserQuestion(TimeBasedModel):
     history = models.CharField(
         max_length=10000, verbose_name="История вопроса", null=True
     )
+    history2 = models.CharField(
+        max_length=10000, verbose_name="История вопроса с временем", null=True
+    )
     state = models.CharField(
         max_length=100, verbose_name="Состояние", default="Открытый вопрос"
     )

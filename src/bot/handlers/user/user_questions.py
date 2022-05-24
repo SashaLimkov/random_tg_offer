@@ -1,3 +1,6 @@
+from datetime import date
+from datetime import datetime
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
@@ -107,6 +110,7 @@ async def is_right_question(message: types.Message, state: FSMContext):
 
 
 async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
+
     data = await state.get_data()
     user_question, file_id = data.get("user_question").split('|')
     await state.finish()
@@ -115,20 +119,33 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
     kurators, mentors = await user_db.select_all_kurators_and_mentors()
     k_list = {k.chanel_id: k.chat_id for k in kurators if k.state == 1}
     m_list = {m.chanel_id: m.chat_id for m in mentors if m.state == 1}
+    dt = datetime.combine(date.today(), datetime.now().time())
+    print(dt.isoformat(timespec='minutes').replace('T', ' '))
     text = "{}\nВопрос от пользователя {}: {}\n{}"
+    history2 = f"Q: {user_question}{str(dt.isoformat(timespec='minutes').replace('T', ' '))}\n"
     history = f"Q: {user_question}\n"
     try:
         q: ModelUserQuestion = await question_db.select_question(user=user)
         helper_id = q.helper_id
         mes_id = eval(q.mes_id)
+        dt = datetime.combine(date.today(), datetime.now().time())
+        print(dt.isoformat(timespec='minutes').replace('T', ' '))
         question = f"Q: {user_question}\n"
+        # print(time.isoformat(timespec='minutes'))
+        # print(str(time))
+        history2 = f"{q.history}{question}{str(dt.isoformat(timespec='minutes').replace('T', ' '))}\n"
         history = f"{q.history}{question}\n"
+        print(history)
         await question_db.add_history(user=user, pk=q.pk, history=history)
+        await question_db.add_history2(user=user, pk=q.pk, history2=history2)
         kurators, mentors = await user_db.select_all_kurators_and_mentors()
         k_list = {k.user_id: k.chat_id for k in kurators}
         m_list = [m.chat_id for m in mentors]
         try:
             if file_id.startswith("."):
+                print('~~~~~~~~~')
+                print(user.name)
+                print(user_question)
                 await bot.send_message(
                     chat_id=k_list[helper_id],
                     text=f"{user.name}: {user_question}",
@@ -229,7 +246,9 @@ async def send_user_questions(call: types.CallbackQuery, state: FSMContext):
         print(e)
         await question_db.add_question(user=user, question=user_question)
     q: ModelUserQuestion = await question_db.select_question(user=user)
+
     await question_db.add_history(user=user, pk=q.pk, history=history)
+    await question_db.add_history2(user=user, pk=q.pk, history2=history2)
     await UserQuestion.waiting_for_new_question.set()
     if user.user_role == "ученик":
         try:
