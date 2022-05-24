@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-t-z554q@_kpp@+3k1yr36n3co-#ub%o1e4i&qy&o*xvxd!6kjw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["80.87.97.253"]
 
 # Application definition
 
@@ -75,14 +75,15 @@ WSGI_APPLICATION = "telegrambot.wsgi.application"
 #
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "usupport",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": os.environ.get("DBHOST"),
-        "PORT": 5433,
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "usupport5",
+        "USER": "usupportuser",
+        "PASSWORD": "cheese_901",
+        "HOST": 'localhost',
+        "PORT": '',
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -117,6 +118,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
